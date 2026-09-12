@@ -1,0 +1,35 @@
+[
+  {
+    "id": "usr-1789071171753-4db6b7",
+    "username": "nkozman",
+    "email": "nkosinathisibanda2007@gmail.com",
+    "fullName": "Nkosinathi",
+    "role": "admin",
+    "salt": "3534e45dabf8d77e5040c9fcb703fa7e",
+    "passwordHash": "5823b3c1f5d191a6e80b03691234b9f6c916b21beafdb42bb361d10b38c34048bc67131bc65a40f45bee71f683de09cc3eed7bf07e449f5856367a225aeff13b",
+    "createdAt": "2026-09-10T20:12:51.753Z",
+    "lastLoginAt": "2026-09-10T20:12:51.753Z"
+  },
+  {
+    "id": "edt-1789073393049-6a1a2c",
+    "username": "tendai.moyo",
+    "email": "tendai@dzinopona.co.zw",
+    "fullName": "Tendai Moyo",
+    "role": "editor",
+    "permissions": {
+      "editContent": true,
+      "manageProducts": true,
+      "manageServices": true,
+      "manageProjects": true,
+      "manageMedia": true,
+      "manageOperations": true,
+      "manageLocations": true
+    },
+    "isActive": true,
+    "salt": "edb120d677f76224e6874aa83de87f8d",
+    "passwordHash": "eddb6528b27231e4d0c804b64e2f4e4dded10b91bac2b48f3e994e094da6be558cf8be3c0b138c2e8a481b69d8468db41f177f1fb4025e0863f495abc1aba296",
+    "createdAt": "2026-09-10T20:49:53.049Z",
+    "createdBy": "Nkosinathi",
+    "lastLoginAt": "2026-09-10T20:50:09.255Z"
+  }
+]

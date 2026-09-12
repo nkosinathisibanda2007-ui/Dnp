@@ -1,0 +1,1190 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-01T00:00:00.000Z",
+  "settings": {
+    "companyName": "Dzinopona Farms",
+    "legalName": "Dzinopona Farms (Private) Limited",
+    "tagline": "Growing Agriculture. Creating Value. Building the Future.",
+    "positioning": "Modern Zimbabwean agricultural enterprise.",
+    "establishedYear": "Registered Enterprise",
+    "homepage": {
+      "heroBadge": "Modern Zimbabwean Agricultural Enterprise",
+      "heroHeadline": "Dzinopona Farms",
+      "heroSubheadline": "Growing Agriculture. Creating Value. Building the Future.",
+      "heroIntro": "A forward-thinking agricultural enterprise operating across Norton, Mvuma, Esigodini, and Ntabazinduna. We develop high-yield cereal and horticultural crops, pedigreed livestock, certified nursery stock, and modern irrigation infrastructure to build enduring agricultural value across Zimbabwe.",
+      "heroPrimaryCta": "Explore Our Operations",
+      "heroSecondaryCta": "Let's Work Together",
+      "factsTicker": [
+        {
+          "label": "Hubs",
+          "value": "4 Strategic",
+          "subtext": "Across Zimbabwe"
+        },
+        {
+          "label": "Disciplines",
+          "value": "11 Integrated",
+          "subtext": "Crops to Livestock"
+        },
+        {
+          "label": "Value Story",
+          "value": "Farm to Market",
+          "subtext": "End-to-End Chain"
+        },
+        {
+          "label": "Entity",
+          "value": "Pvt Limited",
+          "subtext": "Incorporated in ZW"
+        }
+      ],
+      "productionPolicyNotice": "Product availability varies according to production cycles. Please contact us for current availability."
+    },
+    "footer": {
+      "operationalNoticeTitle": "Production Cycles Notice",
+      "operationalNoticeText": "Product availability varies strictly according to seasonal agricultural cycles. We do not fabricate current inventory; contact our commercial desk for confirmed batch allocations.",
+      "agroEcologicalBand": "Zimbabwe Agro-Ecological Regions IIa, III & IV • FARM → PRODUCTION → VALUE → MARKET",
+      "copyrightNotice": "Registered Zimbabwean Agribusiness. All rights reserved."
+    },
+    "valueStoryStages": [
+      {
+        "stage": "FARM",
+        "label": "Land Stewardship & Production",
+        "description": "Strategic deployment of high-potential arable lands and grazing rangelands across Zimbabwe, managed with modern agronomic precision."
+      },
+      {
+        "stage": "MANAGEMENT",
+        "label": "Agronomic & Operational Rigor",
+        "description": "Disciplined water harvesting, irrigation scheduling, strict biosecurity, and science-backed soil health management."
+      },
+      {
+        "stage": "VALUE ADDITION",
+        "label": "Processing & Post-Harvest Care",
+        "description": "Grading, drying, cold chain preservation, and primary processing to maintain maximum nutritional and market value."
+      },
+      {
+        "stage": "MARKET",
+        "label": "Commercial Off-Take & Distribution",
+        "description": "Reliable supply lines feeding commercial processors, retail institutions, regional wholesale hubs, and export channels."
+      }
+    ],
+    "contact": {
+      "primaryEmail": "info@dzinoponafarms.co.zw",
+      "enquiryEmail": "enquiries@dzinoponafarms.co.zw",
+      "corporateAddress": "Harare Corporate Desk & Strategic Operational Hubs across Zimbabwe",
+      "operatingHubsSummary": "Operations established across Norton, Mvuma, Esigodini, and Ntabazinduna.",
+      "phonePlaceholderNote": "Official contact numbers will be published upon final client confirmation."
+    },
+    "seo": {
+      "metaTitle": "Dzinopona Farms | Growing Agriculture. Creating Value. Building the Future.",
+      "metaDescription": "Dzinopona Farms (Private) Limited is a modern Zimbabwean agricultural enterprise specializing in crop production, horticulture, nursery & orchards, livestock, poultry, and value addition.",
+      "keywords": [
+        "Dzinopona Farms",
+        "Zimbabwe agriculture",
+        "commercial farming Zimbabwe",
+        "Norton farming",
+        "Mvuma livestock",
+        "Esigodini horticulture",
+        "Ntabazinduna poultry",
+        "contract farming Zimbabwe",
+        "macadamia nursery Zimbabwe",
+        "beef cattle Zimbabwe"
+      ],
+      "canonicalUrl": "https://dzinoponafarms.co.zw"
+    },
+    "about": {
+      "whoWeAre": "Dzinopona Farms (Private) Limited is a modern Zimbabwean agricultural enterprise committed to building resilient, high-productivity farming operations across the country’s diverse agro-ecological zones. By harmonizing traditional land stewardship with modern irrigation, agronomic precision, and integrated value chains, we transform raw land into sustainable commercial value.",
+      "vision": "To establish Dzinopona Farms as a benchmark Zimbabwean agribusiness recognized for production excellence, sustainable land stewardship, and innovative value chain integration from farm to market.",
+      "mission": "To cultivate high-yield crops and raise healthy livestock through modern agronomy, disciplined farm management, and responsible resource conservation, delivering superior agricultural products while creating enduring value for our partners, consumers, and communities.",
+      "companyBackground": "Dzinopona Farms (Private) Limited is legally incorporated in Zimbabwe. The enterprise was founded on the conviction that sustainable commercial agriculture requires a balanced, diversified portfolio. Rather than concentrating risk in a single commodity or single region, Dzinopona Farms operates across strategic hubs spanning Norton, Mvuma, Esigodini, and Ntabazinduna—allowing the business to leverage specialized microclimates, optimize crop and livestock rotation, and guarantee reliable supply to institutional off-takers and consumers.",
+      "corporateValues": [
+        {
+          "title": "Commercial Excellence",
+          "description": "Executing every agricultural cycle with business discipline, transparent record-keeping, and high operational benchmarks."
+        },
+        {
+          "title": "Responsible Stewardship",
+          "description": "Conserving water resources, replenishing soil organic matter, and safeguarding biodiversity across all our farming hubs."
+        },
+        {
+          "title": "Integrity & Transparency",
+          "description": "Upholding strict commercial honesty with off-takers, input suppliers, contract farming partners, and local communities."
+        },
+        {
+          "title": "Future-Focused Innovation",
+          "description": "Investing in solar energy, high-efficiency irrigation, disease-tolerant crop cultivars, and modern biosecurity protocols."
+        }
+      ],
+      "fivePillars": [
+        {
+          "name": "Productivity",
+          "tagline": "High Yield Through Precision",
+          "description": "Maximizing output per hectare and per animal unit through soil fertility mapping, certified seed selection, and precision nutrient delivery."
+        },
+        {
+          "name": "Quality",
+          "tagline": "Strict Commercial Standards",
+          "description": "Maintaining uncompromising standards from pre-planting soil conditioning to post-harvest sorting, grading, cold chain handling, and biosecure packaging."
+        },
+        {
+          "name": "Responsible Farming",
+          "tagline": "Sustainable Land & Water Stewardship",
+          "description": "Protecting our aquifers through precision drip irrigation, minimal-disturbance conservation tillage, and integrated pasture rotational rest cycles."
+        },
+        {
+          "name": "Innovation",
+          "tagline": "Modern Technology & Agronomy",
+          "description": "Adopting solar-powered water pumping, data-driven disease forecasting, automated climate-controlled nurseries, and modern herd genetics."
+        },
+        {
+          "name": "Value Addition",
+          "tagline": "Beyond Raw Commodities",
+          "description": "Developing on-farm post-harvest handling, milling, drying, and cold storage facilities to capture enhanced value throughout the agricultural supply chain."
+        }
+      ]
+    }
+  },
+  "operations": [
+    {
+      "id": "op-crops",
+      "slug": "crop-production",
+      "title": "Crop Production",
+      "category": "crop_production",
+      "summary": "Large-scale commercial production of staple cereals, oilseeds, and specialized grain varieties under rainfed and irrigated regimes.",
+      "fullDescription": "Crop production forms a cornerstone of Dzinopona Farms’ commercial operations. We specialize in cereals including high-yield white and yellow maize, drought-tolerant sorghum, and winter wheat; oilseeds and protein crops including high-oil soybeans, groundnuts, and sunflower; as well as commercial tuber crops. Operations emphasize conservation tillage, optimized row spacing, and timely agronomic interventions to achieve top-quartile yields.",
+      "keyDetails": [
+        "Commercial cereals: White maize, yellow feed maize, winter wheat, and grain sorghum",
+        "Oilseeds & legumes: Soybeans, confectionery groundnuts, and high-oil sunflowers",
+        "Tubers & starch crops: Commercial potatoes and nutrient-dense sweet potatoes",
+        "Dedicated forage production: Rhodes grass and lucerne/alfalfa for livestock feed security"
+      ],
+      "status": "active",
+      "featuredOnHome": true,
+      "imageSlotId": "media-crops-main",
+      "order": 1
+    },
+    {
+      "id": "op-horticulture",
+      "slug": "horticulture",
+      "title": "Horticulture",
+      "category": "horticulture",
+      "summary": "High-value fresh vegetable production combining open-field precision cultivation with protected tunnel environments.",
+      "fullDescription": "Our horticultural division produces high-demand, market-ready fresh produce tailored for institutional off-takers, supermarkets, and wholesale fresh markets. By leveraging drip irrigation, crop rotation schedules, and integrated pest management, Dzinopona Farms maintains consistent harvest volumes across key seasonal windows.",
+      "keyDetails": [
+        "Staple fresh vegetables: Field and determinate tomatoes, hybrid cabbages, and cured dry onions",
+        "High-value greens: Leafy spinach, Swiss chard, and brassica varieties",
+        "Specialty and fruit-vegetables: Green bell peppers, elongated chilies, and butternut squash",
+        "Transitioning to protected greenhouse tunnels for season-extension and crop protection"
+      ],
+      "status": "active",
+      "featuredOnHome": true,
+      "imageSlotId": "media-horticulture-main",
+      "order": 2
+    },
+    {
+      "id": "op-nursery",
+      "slug": "nursery-orchards",
+      "title": "Nursery & Orchards",
+      "category": "nursery_orchards",
+      "summary": "Tree seedling propagation and commercial tree crop orchards spanning macadamia, citrus, avocado, and heritage indigenous fruits.",
+      "fullDescription": "The nursery and orchard division serves both internal expansion and external seedling demand. We propagate certified rootstocks and grafted cultivars of high-value nut trees, citrus, and avocados, while actively preserving and commercializing indigenous Zimbabwean fruit trees adapted to regional climatic conditions.",
+      "keyDetails": [
+        "High-value nut species: Certified macadamia saplings and selected pecan nut cultivars",
+        "Commercial orchard fruits: Grafted citrus varieties (oranges, lemons, limes), export-grade Hass avocados, and mangoes",
+        "Indigenous fruit propagation: Umuzhanje/Mazhanje (Uapaca kirkiana), Marula (Sclerocarya birrea), and Baobab (Adansonia digitata)",
+        "Meticulous phytosanitary standards to guarantee vigorous, disease-free nursery stock"
+      ],
+      "status": "expanding",
+      "featuredOnHome": true,
+      "imageSlotId": "media-nursery-main",
+      "order": 3
+    },
+    {
+      "id": "op-herbs",
+      "slug": "herbs",
+      "title": "Herbs & Botanicals",
+      "category": "herbs",
+      "summary": "Cultivation of aromatic culinary herbs and medicinal botanical crops for fresh delivery and dehydration processing.",
+      "fullDescription": "Dzinopona Farms is developing dedicated herb acreage targeting niche local markets and export off-takers. Cultivation includes culinary herbs grown under drip irrigation and harvested at peak essential oil content, with drying and packaging facilities in development.",
+      "keyDetails": [
+        "Culinary varieties: Rosemary, sweet basil, oregano, thyme, and mint",
+        "Botanical and medicinal plants: Indigenous and adapted drought-tolerant botanical species",
+        "Processing pathway: Clean shade-drying and moisture-controlled post-harvest handling",
+        "Niche supply agreements with hospitality, wholesale spice, and botanical processors"
+      ],
+      "status": "developing",
+      "featuredOnHome": true,
+      "imageSlotId": "media-herbs-main",
+      "order": 4
+    },
+    {
+      "id": "op-livestock",
+      "slug": "livestock",
+      "title": "Livestock Husbandry",
+      "category": "livestock",
+      "summary": "Commercial beef cattle, dairy cattle development, and small stock (goats) managed under humane, science-backed animal welfare standards.",
+      "fullDescription": "Our livestock operations leverage Zimbabwe’s rich natural rangelands in the Midlands and Matabeleland regions. Combining hardy indigenous genetics with commercial beef and dairy breeds, the herd benefits from rotational paddock grazing, strategic mineral supplementation, and veterinary health oversight.",
+      "keyDetails": [
+        "Beef cattle: Commercial breeding herd, backgrounding weaners, and grass-fed finishing steers",
+        "Dairy cattle program: High-pedigree dairy heifers and milk production infrastructure in development",
+        "Small stock: Boer goats and indigenous goat breeding stock adapted to local forage and climate",
+        "Dedicated fodder conservation: Silage and hay baling to ensure uninterrupted feed security during dry months"
+      ],
+      "status": "active",
+      "featuredOnHome": true,
+      "imageSlotId": "media-livestock-main",
+      "order": 5
+    },
+    {
+      "id": "op-poultry",
+      "slug": "poultry",
+      "title": "Poultry Operations",
+      "category": "poultry",
+      "summary": "Biosecure broiler production, indigenous roadrunner breeds, specialty game fowl, and fresh egg production.",
+      "fullDescription": "Operating from dedicated poultry facilities with strict access-control biosecurity, Dzinopona Farms produces high-quality meat birds and eggs. Our multi-tier flock architecture balances rapid commercial broiler turnover with hardy, free-range indigenous chicken breeds and specialty birds.",
+      "keyDetails": [
+        "Commercial broilers: Staggered batch production ensuring consistent dressed and live bird availability",
+        "Indigenous roadrunner chickens: Hardy, dual-purpose free-range breeds for premium consumer preference",
+        "Specialty poultry: Commercial turkeys and guinea fowl for festive and hospitality markets",
+        "Egg production: Fresh table eggs from well-managed layer flocks with disciplined feeding regimes"
+      ],
+      "status": "active",
+      "featuredOnHome": true,
+      "imageSlotId": "media-poultry-main",
+      "order": 6
+    },
+    {
+      "id": "op-irrigation",
+      "slug": "irrigation-water",
+      "title": "Irrigation & Water Engineering",
+      "category": "irrigation_water",
+      "summary": "Climate-resilient water harvesting, borehole infrastructure, center pivots, and solar-powered micro-drip networks.",
+      "fullDescription": "Water resilience is the fundamental enabler of all agricultural enterprise at Dzinopona Farms. We invest systematically in earth dam storage, high-yield commercial boreholes, solar-powered distribution pumping, and low-loss irrigation systems to decouple our farming cycles from erratic rainfall patterns.",
+      "keyDetails": [
+        "Center pivot systems: Efficient coverage of extensive arable hectares for winter cereals and summer supplement",
+        "Solar-powered drip irrigation: High-efficiency moisture delivery for orchards, nursery, and horticulture",
+        "Water harvesting: Catchment dams and reservoir storage ensuring multi-season water security",
+        "Precision soil moisture monitoring to prevent over-abstraction and conserve precious aquifers"
+      ],
+      "status": "active",
+      "featuredOnHome": true,
+      "imageSlotId": "media-irrigation-main",
+      "order": 7
+    },
+    {
+      "id": "op-development",
+      "slug": "farm-development",
+      "title": "Farm Development & Land Engineering",
+      "category": "farm_development",
+      "summary": "Systematic land clearance, contouring, fencing, renewable energy installations, and modern farm infrastructure.",
+      "fullDescription": "Transforming agricultural land into productive commercial assets requires methodical capital investment. Our farm development team executes soil conditioning, drainage works, perimeter security fencing, staff housing, and off-grid solar micro-grids across our operational hubs.",
+      "keyDetails": [
+        "Soil remediation: Deep ripping, lime application, and organic green manure incorporation",
+        "Contour layout & soil conservation: Erosion prevention structures and graded access roads",
+        "Renewable energy integration: Off-grid solar installations powering water pumps and cold chains",
+        "Secure boundary fencing and internal camp subdivision for rotational pasture management"
+      ],
+      "status": "expanding",
+      "featuredOnHome": false,
+      "imageSlotId": "media-development-main",
+      "order": 8
+    },
+    {
+      "id": "op-processing",
+      "slug": "processing-value-addition",
+      "title": "Processing & Value Addition",
+      "category": "processing_value_addition",
+      "summary": "On-farm grading, drying, cold storage, and initial milling to capture premium value across the agricultural supply chain.",
+      "fullDescription": "Moving beyond primary agricultural extraction, Dzinopona Farms is actively investing in post-harvest handling and primary processing. By grading, packing, and preserving produce on-site, we reduce post-harvest waste and deliver standardized, high-value commodities to market.",
+      "keyDetails": [
+        "Grain conditioning: Mechanical drying, cleaning, and hermetic storage facilities",
+        "Cold storage infrastructure: Temperature-controlled post-harvest holding for fresh horticulture",
+        "Grading and packaging: Commercial sorting lines meeting supermarket and export specifications",
+        "Feed formulation: On-farm blending of supplementary rations utilizing our own grain and forage"
+      ],
+      "status": "developing",
+      "featuredOnHome": false,
+      "imageSlotId": "media-processing-main",
+      "order": 9
+    },
+    {
+      "id": "op-marketing",
+      "slug": "marketing-distribution",
+      "title": "Marketing & Distribution Logistics",
+      "category": "marketing_distribution",
+      "summary": "Structured off-take agreements, reliable wholesale supply, and direct institutional partnerships.",
+      "fullDescription": "Our commercial distribution model bridges farm gates to high-demand consumption centers in Harare, Bulawayo, and regional mining and urban corridors. We build transparent relationships with grain millers, fresh produce markets, food processors, and supermarket chains.",
+      "keyDetails": [
+        "Forward off-taker contracts: Structured supply agreements with commercial millers and retailers",
+        "Direct market delivery: Temperature-managed transport logistics connecting hubs to city markets",
+        "Transparent batch traceability: Rigorous tracking from harvest date to final point of sale",
+        "Continuous market intelligence guiding seasonal planting and livestock off-take targets"
+      ],
+      "status": "active",
+      "featuredOnHome": false,
+      "imageSlotId": "media-marketing-main",
+      "order": 10
+    },
+    {
+      "id": "op-biosecurity",
+      "slug": "biosecurity",
+      "title": "Biosecurity & Herd Health",
+      "category": "biosecurity",
+      "summary": "Strict sanitary protocols, veterinary surveillance, quarantine facilities, and crop health protection.",
+      "fullDescription": "Biosecurity is an uncompromising discipline across all Dzinopona Farms facilities. We enforce vehicle disinfection dips, restricted poultry housing access, strict herd vaccination schedules, and certified pest-free nursery protocols to safeguard our biological assets against epidemic risks.",
+      "keyDetails": [
+        "Livestock health schedules: Mandatory tick control dipping, deworming, and viral disease vaccinations",
+        "Poultry biosecurity: Footbaths, protective clothing mandates, and strict all-in/all-out batching",
+        "Phytosanitary nursery controls: Screened propagation tunnels preventing viral and insect vector transmission",
+        "Continuous collaboration with qualified veterinary and agronomy professionals"
+      ],
+      "status": "active",
+      "featuredOnHome": false,
+      "imageSlotId": "media-biosecurity-main",
+      "order": 11
+    }
+  ],
+  "products": [
+    {
+      "id": "prod-maize",
+      "name": "Commercial White & Yellow Maize",
+      "category": "crops",
+      "subCategory": "Cereals",
+      "description": "High-grade commercial maize grain suitable for human milling (white) and livestock feed formulation (yellow).",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Seasonal harvest batches with scheduled off-take. Contact for bulk quota reservations.",
+      "specifications": [
+        "Moisture content: <12.5%",
+        "Grade A commercial standard",
+        "Bulk grain or 50kg bagging"
+      ],
+      "imageSlotId": "media-prod-maize",
+      "order": 1
+    },
+    {
+      "id": "prod-wheat",
+      "name": "Winter Milling Wheat",
+      "category": "crops",
+      "subCategory": "Cereals",
+      "description": "Irrigated winter wheat grown under center pivot systems with high protein and hectolitre weight.",
+      "status": "in_production",
+      "isAvailableNow": false,
+      "availabilityNote": "Harvested October-November annually. Forward off-taker contracts available.",
+      "specifications": [
+        "High gluten content",
+        "Center pivot grown",
+        "Targeted at commercial flour millers"
+      ],
+      "imageSlotId": "media-prod-wheat",
+      "order": 2
+    },
+    {
+      "id": "prod-sorghum",
+      "name": "Grain Sorghum",
+      "category": "crops",
+      "subCategory": "Cereals",
+      "description": "Drought-hardy grain sorghum suitable for commercial brewing and poultry feed inclusion.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Harvested annually. Inquire for seasonal grain quantities.",
+      "specifications": [
+        "Low tannin varieties",
+        "Cleaned and graded"
+      ],
+      "imageSlotId": "media-prod-sorghum",
+      "order": 3
+    },
+    {
+      "id": "prod-soybeans",
+      "name": "Commercial Soybeans",
+      "category": "crops",
+      "subCategory": "Oilseeds, legumes and tubers",
+      "description": "High-protein, high-oil soybean crops cultivated for edible oil extraction and protein meal production.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Summer harvest. Allocated to commercial oil pressers and feed manufacturers.",
+      "specifications": [
+        "High protein index >38%",
+        "Cleaned and moisture-tested"
+      ],
+      "imageSlotId": "media-prod-soya",
+      "order": 4
+    },
+    {
+      "id": "prod-groundnuts",
+      "name": "Confectionery Groundnuts",
+      "category": "crops",
+      "subCategory": "Oilseeds, legumes and tubers",
+      "description": "Selected confectionery and edible-grade groundnuts with large uniform kernels and sweet flavor.",
+      "status": "in_production",
+      "isAvailableNow": false,
+      "availabilityNote": "Harvested post-summer rains. Available unshelled or shelled by arrangement.",
+      "specifications": [
+        "Aflatoxin-monitored",
+        "Uniform seed size"
+      ],
+      "imageSlotId": "media-prod-groundnuts",
+      "order": 5
+    },
+    {
+      "id": "prod-potatoes",
+      "name": "Table & Commercial Potatoes",
+      "category": "crops",
+      "subCategory": "Oilseeds, legumes and tubers",
+      "description": "Irrigated commercial potatoes produced with smooth skin and consistent size grading for retailers and food service.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Cyclical plantings yielding multiple harvest cycles across the calendar year.",
+      "specifications": [
+        "Available in Large, Medium, and Baby grades",
+        "Packed in standard 10kg/15kg pockets"
+      ],
+      "imageSlotId": "media-prod-potatoes",
+      "order": 6
+    },
+    {
+      "id": "prod-sweet-potatoes",
+      "name": "Orange-Fleshed & White Sweet Potatoes",
+      "category": "crops",
+      "subCategory": "Oilseeds, legumes and tubers",
+      "description": "Nutrient-rich sweet potato tubers including beta-carotene fortified orange varieties.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Available based on seasonal harvest cycles.",
+      "specifications": [
+        "Washed and sorted",
+        "High storage longevity"
+      ],
+      "imageSlotId": "media-prod-sweetpotatoes",
+      "order": 7
+    },
+    {
+      "id": "prod-herbs",
+      "name": "Culinary Herbs (Fresh & Dried)",
+      "category": "crops",
+      "subCategory": "Herbs",
+      "description": "Specialty cultivated rosemary, thyme, sweet basil, and mint grown under precision drip systems.",
+      "status": "developing",
+      "isAvailableNow": false,
+      "availabilityNote": "Herb acreage currently under pilot expansion. Inquire for pilot off-take agreements.",
+      "specifications": [
+        "Fresh bundled or shade-dried flakes",
+        "Grown with minimal pesticide residue"
+      ],
+      "imageSlotId": "media-prod-herbs",
+      "order": 8
+    },
+    {
+      "id": "prod-forages",
+      "name": "Hay Bales & Silage (Rhodes Grass & Lucerne)",
+      "category": "crops",
+      "subCategory": "Forages",
+      "description": "High-nutrient cured hay bales and fermented silage formulated for dairy and beef feed supplement.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Bales available throughout dry season months. Advance reservation recommended.",
+      "specifications": [
+        "Tight rectangular bales ~20-25kg",
+        "Tested crude protein content"
+      ],
+      "imageSlotId": "media-prod-forages",
+      "order": 9
+    },
+    {
+      "id": "prod-tomatoes",
+      "name": "Fresh Market Tomatoes",
+      "category": "crops",
+      "subCategory": "Horticultural produce",
+      "description": "Firm, uniform red tomatoes selected for transport durability, shelf-life, and rich flavor.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Harvested weekly under structured planting cycles. Direct crate supply.",
+      "specifications": [
+        "Grade 1 and Grade 2 options",
+        "Standard wooden/plastic 10kg-20kg crates"
+      ],
+      "imageSlotId": "media-prod-tomatoes",
+      "order": 10
+    },
+    {
+      "id": "prod-cabbages",
+      "name": "Commercial Cabbages",
+      "category": "crops",
+      "subCategory": "Horticultural produce",
+      "description": "Dense, sweet green cabbage heads grown under drip irrigation with excellent field-holding capacity.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Available throughout the cool season and shoulder months.",
+      "specifications": [
+        "Weight range 2.5kg - 4.5kg per head",
+        "Bulk truckload or netted"
+      ],
+      "imageSlotId": "media-prod-cabbages",
+      "order": 11
+    },
+    {
+      "id": "prod-onions",
+      "name": "Cured Red & Brown Onions",
+      "category": "crops",
+      "subCategory": "Horticultural produce",
+      "description": "Properly cured storage onions with tight skins, ensuring minimal shrinkage and long shelf life.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Post-harvest cured batches released seasonally.",
+      "specifications": [
+        "Standard 10kg mesh bags",
+        "Graded medium and large bulbs"
+      ],
+      "imageSlotId": "media-prod-onions",
+      "order": 12
+    },
+    {
+      "id": "prod-nursery-macadamia",
+      "name": "Certified Macadamia Seedlings",
+      "category": "nursery",
+      "subCategory": "Nuts",
+      "description": "Grafted macadamia saplings bred for high nut-in-shell yield and excellent kernel recovery.",
+      "status": "developing",
+      "isAvailableNow": false,
+      "availabilityNote": "Nursery propagation program in progress. Pre-orders open for upcoming planting seasons.",
+      "specifications": [
+        "Certified rootstock varieties",
+        "Hardened in polybags ready for orchard transplant"
+      ],
+      "imageSlotId": "media-prod-macadamia",
+      "order": 13
+    },
+    {
+      "id": "prod-nursery-pecan",
+      "name": "Pecan Nut Seedlings",
+      "category": "nursery",
+      "subCategory": "Nuts",
+      "description": "Vigorous pecan nut nursery trees adapted to local soil conditions with strong taproot development.",
+      "status": "developing",
+      "isAvailableNow": false,
+      "availabilityNote": "Cultivated on specialized nursery schedules. Contact nursery management.",
+      "specifications": [
+        "Disease-indexed nursery stock",
+        "Supplied with planting guide"
+      ],
+      "imageSlotId": "media-prod-pecan",
+      "order": 14
+    },
+    {
+      "id": "prod-nursery-indigenous",
+      "name": "Indigenous Fruit Trees (Umuzhanje, Marula, Baobab)",
+      "category": "nursery",
+      "subCategory": "Indigenous fruits",
+      "description": "Hardy propagated saplings of beloved Zimbabwean heritage trees, preserving biodiversity and ecological resilience.",
+      "status": "developing",
+      "isAvailableNow": true,
+      "availabilityNote": "Small batch propagation. Inquire for seasonal inventory numbers.",
+      "specifications": [
+        "Uapaca kirkiana (Umuzhanje/Mazhanje)",
+        "Sclerocarya birrea (Marula)",
+        "Adansonia digitata (Baobab)"
+      ],
+      "imageSlotId": "media-prod-indigenous-trees",
+      "order": 15
+    },
+    {
+      "id": "prod-nursery-citrus-avocado",
+      "name": "Grafted Citrus & Hass Avocado Saplings",
+      "category": "nursery",
+      "subCategory": "Exotic fruits",
+      "description": "High-yielding grafted citrus (orange, lemon) and Hass avocado nursery trees prepared for commercial orchards.",
+      "status": "developing",
+      "isAvailableNow": false,
+      "availabilityNote": "Propagated under shaded phytosanitary tunnels. Pre-order reservation available.",
+      "specifications": [
+        "True-to-type certified scions",
+        "Robust root systems"
+      ],
+      "imageSlotId": "media-prod-citrus-avocado",
+      "order": 16
+    },
+    {
+      "id": "prod-dairy-stock",
+      "name": "Dairy Breeding Heifers & Dairy Stock",
+      "category": "livestock",
+      "subCategory": "Dairy cattle",
+      "description": "Quality dairy heifers selected for milk yield potential, structural soundness, and acclimatization to Zimbabwean conditions.",
+      "status": "developing",
+      "isAvailableNow": false,
+      "availabilityNote": "Dairy herd development program underway. Future breeding stock releases planned.",
+      "specifications": [
+        "High butterfat genetic lineage",
+        "Complete veterinary vaccination history"
+      ],
+      "imageSlotId": "media-prod-dairy",
+      "order": 17
+    },
+    {
+      "id": "prod-beef-cattle",
+      "name": "Commercial Beef Weaners & Cattle",
+      "category": "livestock",
+      "subCategory": "Beef cattle",
+      "description": "Hardy commercial beef cattle raised on natural grazing and mineral licks with sound bone structure and rapid weight gain.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Batches marketed in accordance with weaning cycles and feedlot placement. Contact livestock desk.",
+      "specifications": [
+        "Grass-raised with backgrounding",
+        "Vaccinated against blackleg, anthrax, and lumpy skin disease"
+      ],
+      "imageSlotId": "media-prod-beef",
+      "order": 18
+    },
+    {
+      "id": "prod-goats",
+      "name": "Breeding & Meat Goats",
+      "category": "livestock",
+      "subCategory": "Goats",
+      "description": "Resilient indigenous cross Boer goats renowned for prolific kidding, browse utilization, and lean meat yield.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Breeding bucks, does, and market kids available periodically.",
+      "specifications": [
+        "Hardy disease resistance",
+        "Pasture-browsed in Midlands & Matabeleland hubs"
+      ],
+      "imageSlotId": "media-prod-goats",
+      "order": 19
+    },
+    {
+      "id": "prod-broilers",
+      "name": "Commercial Broiler Chickens (Live & Dressed)",
+      "category": "poultry",
+      "subCategory": "Broilers",
+      "description": "Fast-growing commercial broilers raised on balanced nutritional feed in hygienic, ventilated housing.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Scheduled cycles yielding continuous live birds and chilled dressed carcasses.",
+      "specifications": [
+        "Average weight 1.8kg - 2.3kg",
+        "Strict withdrawal period compliance"
+      ],
+      "imageSlotId": "media-prod-broilers",
+      "order": 20
+    },
+    {
+      "id": "prod-roadrunners",
+      "name": "Indigenous Roadrunner Chickens",
+      "category": "poultry",
+      "subCategory": "Chicken breeds",
+      "description": "Hardy traditional free-range chicken breeds prized for flavorful, firm meat and rich, golden yolks.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Reared in dedicated free-range runs. High consumer demand; advance orders encouraged.",
+      "specifications": [
+        "Natural foraging diet supplemented with grain",
+        "Distinct natural gamey flavor"
+      ],
+      "imageSlotId": "media-prod-roadrunners",
+      "order": 21
+    },
+    {
+      "id": "prod-turkeys-guineafowl",
+      "name": "Turkeys & Guinea Fowl",
+      "category": "poultry",
+      "subCategory": "Turkeys & Guinea fowl",
+      "description": "Table birds and breeding stock of broad-breasted turkeys and domesticated helmeted guinea fowl.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Specialty batches supplied for festive seasons, hospitality venues, and private breeders.",
+      "specifications": [
+        "Turkeys: 5kg - 10kg liveweight",
+        "Guinea fowl: Table weight and fertile hatching eggs"
+      ],
+      "imageSlotId": "media-prod-turkeys",
+      "order": 22
+    },
+    {
+      "id": "prod-eggs",
+      "name": "Farm-Fresh Table Eggs",
+      "category": "poultry",
+      "subCategory": "Eggs",
+      "description": "Farm-fresh commercial eggs with strong shells and bright yolks, collected daily and graded for wholesale supply.",
+      "status": "in_production",
+      "isAvailableNow": true,
+      "availabilityNote": "Daily collection. Available in standard 30-egg crates and wholesale cartons.",
+      "specifications": [
+        "Large and Medium grades",
+        "Cleaned, candle-inspected, and crated"
+      ],
+      "imageSlotId": "media-prod-eggs",
+      "order": 23
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj-irrigation",
+      "title": "Commercial Irrigation Expansion",
+      "type": "Irrigation Development",
+      "phase": "Active Implementation",
+      "locationHub": "Norton & Mvuma Hubs",
+      "summary": "Expanding electrified and solar center pivots and pressurized underground mainline networks to double irrigated arable hectares.",
+      "objectives": [
+        "Secure year-round cereal and winter wheat cropping independent of rainfall fluctuations",
+        "Install smart variable-rate water application controllers to preserve energy and water",
+        "Commission high-capacity deep boreholes and surface dam integration"
+      ],
+      "keyMilestones": [
+        "Phase 1 hydrologic surveys and borehole drilling completed",
+        "Center pivot civil foundations and pipe laying currently underway",
+        "Solar pumping booster station installation scheduled for next quarter"
+      ],
+      "isDevelopment": true,
+      "imageSlotId": "media-proj-irrigation",
+      "order": 1
+    },
+    {
+      "id": "proj-orchards",
+      "title": "Commercial Macadamia & Citrus Orchard Establishment",
+      "type": "Orchard Development",
+      "phase": "Planning & Design",
+      "locationHub": "Esigodini Hub",
+      "summary": "Developing long-term perennial tree crop blocks backed by precision micro-jet irrigation and windbreak landscaping.",
+      "objectives": [
+        "Establish high-density commercial macadamia nut blocks for export diversification",
+        "Plant commercial citrus cultivars targeting domestic juice processors and fresh retail",
+        "Integrate automated fertigation dosing systems for optimal tree nutrition"
+      ],
+      "keyMilestones": [
+        "Land surveying, slope contouring, and soil pH correction completed",
+        "Nursery propagation of rootstocks currently advancing in holding tunnels",
+        "Field planting of first commercial block targeted for next rainy season"
+      ],
+      "isDevelopment": true,
+      "imageSlotId": "media-proj-orchards",
+      "order": 2
+    },
+    {
+      "id": "proj-horticulture",
+      "title": "Protected Horticulture & High-Tunnel Development",
+      "type": "Horticulture Development",
+      "phase": "Phase 1 Commissioned",
+      "locationHub": "Norton & Esigodini Hubs",
+      "summary": "Scaling protected multi-span greenhouse tunnels to eliminate weather risks, minimize pests, and supply premium fresh produce year-round.",
+      "objectives": [
+        "Mitigate hail, extreme temperature spikes, and insect pressures on sensitive crops",
+        "Guarantee non-stop winter supply of high-grade tomatoes and sweet bell peppers",
+        "Achieve water savings of up to 40% compared to open-field flood irrigation"
+      ],
+      "keyMilestones": [
+        "Initial steel tunnel structures erected and clad with UV-stabilized film",
+        "Drip irrigation manifolds and automated filtration stations commissioned",
+        "Second phase expansion of additional hectares scheduled for rollout"
+      ],
+      "isDevelopment": true,
+      "imageSlotId": "media-proj-horticulture",
+      "order": 3
+    },
+    {
+      "id": "proj-poultry",
+      "title": "Semi-Automated Commercial Poultry Expansion",
+      "type": "Poultry Development",
+      "phase": "Active Implementation",
+      "locationHub": "Ntabazinduna Hub",
+      "summary": "Upgrading poultry housing with modern evaporative cooling pads, automated feeding pans, and enhanced biosecurity perimeters.",
+      "objectives": [
+        "Scale broiler production capacity to meet growing institutional off-taker demand",
+        "Establish dedicated indigenous roadrunner breeding pavilions with pasture access",
+        "Incorporate on-site egg washing, candling, and cold room holding capacity"
+      ],
+      "keyMilestones": [
+        "Structural brick and steel framing completed for two primary broiler sheds",
+        "Ventilation systems and biosecurity shower-in/shower-out station under construction",
+        "First batch placement under upgraded infrastructure anticipated this year"
+      ],
+      "isDevelopment": true,
+      "imageSlotId": "media-proj-poultry",
+      "order": 4
+    },
+    {
+      "id": "proj-livestock",
+      "title": "Herd Genetics Upgrade & Pasture Rehabilitation",
+      "type": "Livestock Development",
+      "phase": "Active Implementation",
+      "locationHub": "Mvuma & Ntabazinduna Hubs",
+      "summary": "Introducing superior commercial beef genetics, establishing high-protein fodder banks, and subdividing grazing rangelands.",
+      "objectives": [
+        "Improve weaning weights and feed conversion efficiency through proven genetics",
+        "Implement cell grazing systems with solar-powered electric fencing to revive native grasses",
+        "Construct a covered handling crush, dip tank, and weighbridge for accurate herd monitoring"
+      ],
+      "keyMilestones": [
+        "Subdivision of 12 grazing camps with permanent water points completed",
+        "Acquisition of top-tier registered breeding bulls concluded",
+        "Feedlot fattening pen civil works underway for dry-season cattle finishing"
+      ],
+      "isDevelopment": true,
+      "imageSlotId": "media-proj-livestock",
+      "order": 5
+    },
+    {
+      "id": "proj-infrastructure",
+      "title": "Farm Infrastructure, Solar Energy & Cold Storage",
+      "type": "Farm Infrastructure",
+      "phase": "Expanding",
+      "locationHub": "All Strategic Hubs",
+      "summary": "Deploying commercial off-grid solar arrays, temperature-controlled cold rooms, heavy equipment workshops, and secure perimeter boundaries.",
+      "objectives": [
+        "Achieve operational self-sufficiency from national grid outages across critical water and cold chain assets",
+        "Preserve harvested horticulture quality through pre-cooling and cold room staging",
+        "Provide modern, dignified on-farm accommodation and amenities for our dedicated workforce"
+      ],
+      "keyMilestones": [
+        "Solar PV arrays installed powering main borehole clusters and administrative offices",
+        "Cold storage containerized unit placed at primary aggregation point",
+        "Perimeter security fencing and vehicle disinfection dips fully operational"
+      ],
+      "isDevelopment": true,
+      "imageSlotId": "media-proj-infrastructure",
+      "order": 6
+    }
+  ],
+  "services": [
+    {
+      "id": "serv-farm-management",
+      "title": "Comprehensive Farm Management",
+      "shortDescription": "Full operational oversight, agronomic planning, machinery deployment, and financial accountability for commercial landholdings.",
+      "fullDescription": "Dzinopona Farms delivers end-to-end farm management services for private landowners, institutional investors, and agricultural trusts seeking professional operational oversight. Our experienced agricultural managers handle seasonal planning, input procurement, labor supervision, machinery maintenance, and commercial harvest marketing.",
+      "deliverables": [
+        "Detailed annual cropping and livestock business plans with cash-flow projections",
+        "Dedicated on-site agricultural management personnel and technical supervision",
+        "Rigorous maintenance and utilization logs for all farm machinery and infrastructure",
+        "Transparent monthly operational reports and audited financial accounting"
+      ],
+      "targetAudience": "Commercial landowners, diaspora investors, agricultural syndicates, and financial institutions holding agricultural assets.",
+      "imageSlotId": "media-serv-management",
+      "order": 1
+    },
+    {
+      "id": "serv-contract-farming",
+      "title": "Contract Farming & Outgrower Schemes",
+      "shortDescription": "Structured joint-production agreements, certified input financing arrangements, and guaranteed commercial off-take agreements.",
+      "fullDescription": "We partner with vetted commercial growers and outgrowers across Zimbabwe to scale agricultural output. Under our structured contract farming framework, we provide high-grade seed, certified fertilizers, agronomic field visits, and guaranteed market purchase at transparent, indexed commodity prices.",
+      "deliverables": [
+        "Structured input financing packages tailored to specific soil and crop requirements",
+        "Scheduled technical visits by qualified agronomists throughout the vegetative cycle",
+        "Pre-agreed off-taker purchase contracts eliminating market access uncertainty for farmers",
+        "Post-harvest aggregation and logistical transport directly from the farm gate"
+      ],
+      "targetAudience": "Commercial farmers with available land and water seeking working capital, technical mentorship, and assured market off-take.",
+      "imageSlotId": "media-serv-contract",
+      "order": 2
+    },
+    {
+      "id": "serv-agronomy-veterinary",
+      "title": "Agronomy & Veterinary Technical Services",
+      "shortDescription": "Precision soil fertility analysis, customized crop nutrition scheduling, livestock herd health programs, and disease surveillance.",
+      "fullDescription": "Our technical specialists bridge scientific agricultural research with practical field application. We assist farming operations in diagnosing crop deficiencies, designing balanced fertilizer programs, implementing integrated pest management, and managing livestock preventative health regimens.",
+      "deliverables": [
+        "Soil sampling and laboratory analysis with lime and nutrient corrective recommendations",
+        "Customized crop protection schedules compliant with maximum residue level standards",
+        "Livestock herd health calendars including vaccination, dipping, and deworming protocols",
+        "Emergency field disease diagnostics and remediation strategies"
+      ],
+      "targetAudience": "Intensive horticultural producers, cereal growers, and commercial livestock farmers aiming to eliminate preventable production losses.",
+      "imageSlotId": "media-serv-agronomy",
+      "order": 3
+    },
+    {
+      "id": "serv-consultancy",
+      "title": "Agricultural Feasibility & Advisory Consultancy",
+      "shortDescription": "Independent agribusiness feasibility studies, irrigation design, enterprise budgeting, and operational turnaround strategies.",
+      "fullDescription": "Navigating Zimbabwe’s agricultural landscape requires deep practical knowledge of local climate zones, soil types, market dynamics, and regulatory requirements. Dzinopona Farms offers strategic advisory services for greenfield developments, farm acquisitions, and underperforming agricultural enterprises.",
+      "deliverables": [
+        "Bankable feasibility studies for commercial farming ventures and agribusiness expansions",
+        "Hydrological assessments, dam siting analysis, and irrigation system engineering plans",
+        "Enterprise budgeting and gross margin analysis across competing agricultural commodities",
+        "Turnaround roadmaps for underutilized farm properties to restore commercial viability"
+      ],
+      "targetAudience": "Agribusiness entrepreneurs, corporate investors, development agencies, and financial institutions assessing agricultural projects.",
+      "imageSlotId": "media-serv-consultancy",
+      "order": 4
+    }
+  ],
+  "locations": [
+    {
+      "id": "loc-norton",
+      "name": "Norton",
+      "province": "Mashonaland West Province",
+      "agroEcologicalZone": "Natural Region IIa (High rainfall, prime arable belt)",
+      "summary": "High-potential arable and intensive horticultural hub benefiting from rich soils, irrigation dams, and rapid proximity to the Harare commercial market.",
+      "primaryFocus": [
+        "Commercial white & yellow maize production",
+        "Irrigated winter wheat under center pivots",
+        "Protected greenhouse horticulture (tomatoes, peppers, greens)",
+        "Strategic aggregation and distribution hub for capital city markets"
+      ],
+      "infrastructureOverview": "Equipped with center pivot irrigation infrastructure, surface dam access, mechanized implements, and protected greenhouse structures.",
+      "coordinates": {
+        "lat": -17.8833,
+        "lng": 30.7
+      },
+      "isCoordinatesConfirmed": false,
+      "imageSlotId": "media-loc-norton",
+      "order": 1
+    },
+    {
+      "id": "loc-mvuma",
+      "name": "Mvuma",
+      "province": "Midlands Province",
+      "agroEcologicalZone": "Natural Region III (Semi-intensive farming & livestock rangeland)",
+      "summary": "Central farming hub balancing broad-acre grain and forage production with extensive beef cattle rangeland grazing.",
+      "primaryFocus": [
+        "Commercial beef cattle breeding and backgrounding herds",
+        "Drought-tolerant grain sorghum and silage maize production",
+        "Pasture improvement and dry-season hay bale conservation",
+        "Rotational paddock grazing management across natural rangeland"
+      ],
+      "infrastructureOverview": "Features fenced grazing paddocks, solar borehole pumping stations, livestock handling crushes, and forage harvesting machinery.",
+      "coordinates": {
+        "lat": -19.2833,
+        "lng": 30.5333
+      },
+      "isCoordinatesConfirmed": false,
+      "imageSlotId": "media-loc-mvuma",
+      "order": 2
+    },
+    {
+      "id": "loc-esigodini",
+      "name": "Esigodini",
+      "province": "Matabeleland South Province",
+      "agroEcologicalZone": "Natural Region IV (Favorable microclimates in river valleys & granite hills)",
+      "summary": "Specialized nursery, orchard development, and intensive horticultural center situated within an established commercial agricultural valley.",
+      "primaryFocus": [
+        "Certified tree crop nursery (macadamia, pecan, citrus, avocados)",
+        "Indigenous heritage tree seedling propagation (Umuzhanje, Marula, Baobab)",
+        "Intensive drip-irrigated horticulture for regional urban supply",
+        "Orchard block development under micro-jet irrigation"
+      ],
+      "infrastructureOverview": "Shade-cloth nursery tunnels, precision misting systems, borehole reticulation networks, and orchard preparation areas.",
+      "coordinates": {
+        "lat": -20.2833,
+        "lng": 28.9333
+      },
+      "isCoordinatesConfirmed": false,
+      "imageSlotId": "media-loc-esigodini",
+      "order": 3
+    },
+    {
+      "id": "loc-ntabazinduna",
+      "name": "Ntabazinduna",
+      "province": "Matabeleland North Province",
+      "agroEcologicalZone": "Natural Region IV (Strategic semi-arid commercial corridor)",
+      "summary": "Strategic hub prioritizing biosecure commercial poultry, hardy indigenous roadrunner breeding, goat husbandry, and regional distribution.",
+      "primaryFocus": [
+        "Commercial broiler production cycles in biosecure housing",
+        "Free-range indigenous chicken (roadrunner) breeding and multiplication",
+        "Resilient Boer and indigenous cross goat husbandry",
+        "Fresh table egg layer management and direct distribution to Bulawayo"
+      ],
+      "infrastructureOverview": "Ventilated poultry houses, perimeter biosecurity fencing, feed storage barns, and clean solar borehole water filtration.",
+      "coordinates": {
+        "lat": -20.0167,
+        "lng": 28.8333
+      },
+      "isCoordinatesConfirmed": false,
+      "imageSlotId": "media-loc-ntabazinduna",
+      "order": 4
+    }
+  ],
+  "mediaSlots": {
+    "media-hero-main": {
+      "id": "media-hero-main",
+      "label": "Main Farm Landscape & Operations (Hero)",
+      "category": "hero",
+      "description": "Active operational field motion video of maize shelling and grain harvesting at Dzinopona Farms Norton facility.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "mediaType": "video",
+      "url": "/assets/maize_harvest_video.mp4",
+      "posterUrl": "/assets/maize_harvest_sheller_1789075425641.jpg",
+      "altText": "Operational field harvesting and maize shelling at Dzinopona Farms Norton facility",
+      "caption": "Norton Hub • Commercial Grain Shelling & Quality Curing in Motion",
+      "isCustomUploaded": true
+    },
+    "media-crops-main": {
+      "id": "media-crops-main",
+      "label": "Crop Production & Commercial Fields",
+      "category": "crops",
+      "description": "Vigorous commercial maize or winter wheat fields with modern tractor or combine harvester operations.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Commercial crop production fields at Dzinopona Farms",
+      "caption": "Commercial Cereal & Grain Production",
+      "isCustomUploaded": false
+    },
+    "media-horticulture-main": {
+      "id": "media-horticulture-main",
+      "label": "Horticultural Crops & Tunnel Production",
+      "category": "crops",
+      "description": "Healthy rows of staked tomatoes, cabbage fields, or green peppers with precision drip irrigation lines.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1592417817098-8f3d69109853?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Intensive fresh vegetable horticulture at Dzinopona Farms",
+      "caption": "Fresh Horticultural Produce Under Drip Irrigation",
+      "isCustomUploaded": false
+    },
+    "media-nursery-main": {
+      "id": "media-nursery-main",
+      "label": "Tree Nursery & Sapling Propagation",
+      "category": "nursery",
+      "description": "Vibrant macadamia, avocado, and indigenous fruit seedlings in neat nursery rows under protective shade-cloth.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Commercial tree seedling nursery and orchard propagation at Dzinopona Farms",
+      "caption": "Tree Nursery & Orchard Development",
+      "isCustomUploaded": false
+    },
+    "media-herbs-main": {
+      "id": "media-herbs-main",
+      "label": "Botanical & Culinary Herb Acreage",
+      "category": "crops",
+      "description": "Lush rows of aromatic rosemary, sweet basil, or thyme in sunlight.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1618164436241-4473940d1f5c?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Aromatic herb cultivation at Dzinopona Farms",
+      "caption": "Specialty Herbs & Botanical Crops",
+      "isCustomUploaded": false
+    },
+    "media-livestock-main": {
+      "id": "media-livestock-main",
+      "label": "Beef Cattle Grazing on Rangeland",
+      "category": "livestock",
+      "description": "Healthy commercial beef cattle grazing peacefully in well-managed rangeland pastures with indigenous trees in background.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1570042225831-d98fa7577f1e?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Commercial beef cattle grazing on natural pasture at Dzinopona Farms",
+      "caption": "Livestock Husbandry & Pasture Management",
+      "isCustomUploaded": false
+    },
+    "media-poultry-main": {
+      "id": "media-poultry-main",
+      "label": "Poultry Operations & Housing",
+      "category": "poultry",
+      "description": "Clean, modern poultry housing showing well-spaced broilers or free-range indigenous roadrunners.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Biosecure poultry facilities at Dzinopona Farms",
+      "caption": "Commercial Broiler & Indigenous Poultry Facilities",
+      "isCustomUploaded": false
+    },
+    "media-irrigation-main": {
+      "id": "media-irrigation-main",
+      "label": "Center Pivot Irrigation & Water Storage",
+      "category": "infrastructure",
+      "description": "Center pivot irrigation arm sweeping over vibrant green crops with water spray reflecting morning light.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Center pivot irrigation system operating at Dzinopona Farms",
+      "caption": "Center Pivot & Solar Irrigation Infrastructure",
+      "isCustomUploaded": false
+    },
+    "media-development-main": {
+      "id": "media-development-main",
+      "label": "Land Preparation & Farm Engineering",
+      "category": "infrastructure",
+      "description": "Heavy machinery preparing soil, installing solar pumping stations, or grading farm contour structures.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Farm development and land improvement works at Dzinopona Farms",
+      "caption": "Farm Development & Infrastructure Engineering",
+      "isCustomUploaded": false
+    },
+    "media-processing-main": {
+      "id": "media-processing-main",
+      "label": "Post-Harvest Handling & Cold Storage",
+      "category": "infrastructure",
+      "description": "Clean post-harvest facility with crates of sorted produce, grain drying, or cold room holding.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Post-harvest grading and cold chain facilities at Dzinopona Farms",
+      "caption": "Processing, Grading & Value Addition",
+      "isCustomUploaded": false
+    },
+    "media-marketing-main": {
+      "id": "media-marketing-main",
+      "label": "Commercial Off-Take Logistics & Fleet",
+      "category": "infrastructure",
+      "description": "Clean agricultural transport vehicle being loaded with fresh produce crates or bulk grain bags.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Agricultural distribution and off-take transport at Dzinopona Farms",
+      "caption": "Commercial Marketing & Distribution",
+      "isCustomUploaded": false
+    },
+    "media-biosecurity-main": {
+      "id": "media-biosecurity-main",
+      "label": "Biosecurity Protocols & Veterinary Care",
+      "category": "infrastructure",
+      "description": "Veterinary health inspection, clean footwear sanitation dip, and orderly handling facilities.",
+      "aspectRatio": "16:9",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1594771804886-a933bb2d609b?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Biosecurity and animal health standards at Dzinopona Farms",
+      "caption": "Strict Biosecurity & Herd Health Surveillance",
+      "isCustomUploaded": false
+    },
+    "media-loc-norton": {
+      "id": "media-loc-norton",
+      "label": "Norton Strategic Farming Hub",
+      "category": "locations",
+      "description": "Arable fields and horticulture development near Norton, Mashonaland West.",
+      "aspectRatio": "4:3",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Norton farming operations at Dzinopona Farms",
+      "caption": "Norton Hub • Arable Cereals & Horticulture",
+      "isCustomUploaded": false
+    },
+    "media-loc-mvuma": {
+      "id": "media-loc-mvuma",
+      "label": "Mvuma Strategic Farming Hub",
+      "category": "locations",
+      "description": "Central Midlands rangeland pastures and livestock grazing in Mvuma.",
+      "aspectRatio": "4:3",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Mvuma livestock and grain rangeland at Dzinopona Farms",
+      "caption": "Mvuma Hub • Livestock & Central Grains",
+      "isCustomUploaded": false
+    },
+    "media-loc-esigodini": {
+      "id": "media-loc-esigodini",
+      "label": "Esigodini Strategic Farming Hub",
+      "category": "locations",
+      "description": "Nursery shade tunnels and orchard development in Esigodini valley.",
+      "aspectRatio": "4:3",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Esigodini tree nursery and orchard hub at Dzinopona Farms",
+      "caption": "Esigodini Hub • Tree Nursery & Orchards",
+      "isCustomUploaded": false
+    },
+    "media-loc-ntabazinduna": {
+      "id": "media-loc-ntabazinduna",
+      "label": "Ntabazinduna Strategic Farming Hub",
+      "category": "locations",
+      "description": "Poultry and small stock operations in Ntabazinduna corridor.",
+      "aspectRatio": "4:3",
+      "focalPoint": "center",
+      "url": "https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=1600&auto=format&fit=crop",
+      "altText": "Ntabazinduna poultry and goat facilities at Dzinopona Farms",
+      "caption": "Ntabazinduna Hub • Poultry & Small Stock",
+      "isCustomUploaded": false
+    }
+  }
+}

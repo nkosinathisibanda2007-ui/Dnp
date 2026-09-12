@@ -1,0 +1,6 @@
+{
+  "name": "Dzinopona Farms",
+  "description": "Modern Zimbabwean agricultural enterprise specializing in crop production, horticulture, nursery, livestock, and value addition.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "id": "audit-1789073409257-9a5372ef",
+    "timestamp": "2026-09-10T20:50:09.257Z",
+    "userId": "edt-1789073393049-6a1a2c",
+    "username": "tendai.moyo",
+    "fullName": "Tendai Moyo",
+    "role": "editor",
+    "action": "LOGIN_SUCCESS",
+    "module": "auth",
+    "section": "auth",
+    "summary": "Authorized Content Editor authenticated: Tendai Moyo (@tendai.moyo)",
+    "recordName": "Tendai Moyo",
+    "details": "Authorized Content Editor authenticated: Tendai Moyo (@tendai.moyo)"
+  },
+  {
+    "id": "audit-1789073393050-7f9b7e72",
+    "timestamp": "2026-09-10T20:49:53.050Z",
+    "username": "nkozman",
+    "fullName": "Nkosinathi",
+    "role": "admin",
+    "action": "EDITOR_CREATED",
+    "module": "editors",
+    "section": "editors",
+    "summary": "Admin created new Editor account: Tendai Moyo (@tendai.moyo)",
+    "recordId": "edt-1789073393049-6a1a2c",
+    "recordName": "Tendai Moyo",
+    "details": "Admin created new Editor account: Tendai Moyo (@tendai.moyo)"
+  },
+  {
+    "id": "audit-1789071171754-ea8ae16b",
+    "timestamp": "2026-09-10T20:12:51.754Z",
+    "username": "nkozman",
+    "action": "BOOTSTRAP_INITIAL_ADMIN",
+    "section": "auth",
+    "details": "Initial administrative account provisioned for Nkosinathi (nkozman)"
+  }
+]

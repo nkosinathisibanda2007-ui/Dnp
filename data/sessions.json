@@ -1,0 +1,29 @@
+[
+  {
+    "token": "59bd8603c99c286ec355f0c73a5b57436df9844f9a910e2de66bc7ad49716766",
+    "userId": "usr-1789071171753-4db6b7",
+    "username": "nkozman",
+    "role": "admin",
+    "fullName": "Nkosinathi",
+    "createdAt": "2026-09-10T20:12:51.754Z",
+    "expiresAt": "2026-09-17T20:12:51.754Z"
+  },
+  {
+    "token": "3ff1a3f67753967c1e05405efe59efd971992e548d9124454de34a1c2564a2dc",
+    "userId": "edt-1789073393049-6a1a2c",
+    "username": "tendai.moyo",
+    "role": "editor",
+    "fullName": "Tendai Moyo",
+    "permissions": {
+      "editContent": true,
+      "manageProducts": true,
+      "manageServices": true,
+      "manageProjects": true,
+      "manageMedia": true,
+      "manageOperations": true,
+      "manageLocations": true
+    },
+    "createdAt": "2026-09-10T20:50:09.257Z",
+    "expiresAt": "2026-09-17T20:50:09.257Z"
+  }
+]
