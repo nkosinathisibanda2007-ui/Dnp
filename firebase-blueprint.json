@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "CmsContent": {
+      "title": "CmsContent",
+      "description": "Master CMS content for Dzinopona Farms including site settings, agricultural divisions, projects, and hub locations.",
+      "type": "object",
+      "properties": {
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Admin identifier or email"
+        },
+        "version": {
+          "type": "number",
+          "description": "Schema version number"
+        }
+      },
+      "required": ["updatedAt"]
+    },
+    "ContactSubmission": {
+      "title": "ContactSubmission",
+      "description": "Customer inquiry or quote request submitted through the website.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique inquiry ID"
+        },
+        "name": {
+          "type": "string",
+          "description": "Customer full name",
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "description": "Customer contact email",
+          "maxLength": 160
+        },
+        "phone": {
+          "type": "string",
+          "description": "Customer phone number",
+          "maxLength": 40
+        },
+        "interest": {
+          "type": "string",
+          "description": "Agricultural division or service category",
+          "maxLength": 100
+        },
+        "message": {
+          "type": "string",
+          "description": "Inquiry text",
+          "maxLength": 3000
+        },
+        "submittedAt": {
+          "type": "string",
+          "description": "ISO timestamp of submission"
+        },
+        "status": {
+          "type": "string",
+          "description": "Review status",
+          "enum": ["new", "reviewed", "contacted", "archived"]
+        }
+      },
+      "required": ["id", "name", "email", "message", "submittedAt"]
+    },
+    "TestConnection": {
+      "title": "TestConnection",
+      "description": "Health check connection test document.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "Status message"
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/cms_data/{docId}": {
+      "schema": "CmsContent",
+      "description": "Global CMS content storage for live farm portal configuration and content"
+    },
+    "/submissions/{submissionId}": {
+      "schema": "ContactSubmission",
+      "description": "Client quote inquiries and commercial farm consultation requests"
+    },
+    "/test/{docId}": {
+      "schema": "TestConnection",
+      "description": "SDK initial connection verification"
+    }
+  }
+}

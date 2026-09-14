@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper to guard document IDs from path injection attacks
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Helper for submission validation
+    function isValidSubmission(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 120 &&
+             data.email is string && data.email.size() > 0 && data.email.size() <= 160 &&
+             data.message is string && data.message.size() > 0 && data.message.size() <= 3000 &&
+             data.submittedAt is string && data.submittedAt.size() <= 50 &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 40)) &&
+             (!('interest' in data) || (data.interest is string && data.interest.size() <= 100));
+    }
+
+    // CMS dynamic content configuration
+    match /cms_data/{docId} {
+      allow get: if isValidId(docId);
+      allow list: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Customer inquiries and quote requests
+    match /submissions/{submissionId} {
+      allow create: if isValidId(submissionId) && isValidSubmission(request.resource.data);
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // Initial SDK connection health verification
+    match /test/{docId} {
+      allow read: if isValidId(docId);
+      allow write: if request.auth != null;
+    }
+  }
+}

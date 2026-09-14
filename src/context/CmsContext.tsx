@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db, auth, OperationType, handleFirestoreError } from '../lib/firebase';
 import {
   CmsDatabase,
   ProductItem,
@@ -180,6 +182,34 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
+
+  // Sync content with Firestore on initial load
+  useEffect(() => {
+    let isMounted = true;
+    getDoc(doc(db, 'cms_data', 'content'))
+      .then((snapshot) => {
+        if (!isMounted) return;
+        if (snapshot.exists()) {
+          const remoteData = snapshot.data();
+          if (remoteData && remoteData.content) {
+            setData((prev) => ({
+              ...prev,
+              ...remoteData.content,
+              settings: { ...prev.settings, ...(remoteData.content.settings || {}) },
+              mediaSlots: { ...prev.mediaSlots, ...(remoteData.content.mediaSlots || {}) },
+            }));
+          }
+        }
+      })
+      .catch((err) => {
+        // Fall back gracefully to local storage
+        console.debug('Using local/cached CMS data:', err);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Persist content to local storage
   useEffect(() => {
@@ -866,6 +896,22 @@ export const CmsProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setSubmissions((prev) => [localEntry, ...prev]);
+
+    // Persist to Firebase Firestore
+    try {
+      await setDoc(doc(db, 'submissions', localEntry.id), {
+        id: localEntry.id,
+        name: (localEntry.name || 'Anonymous').slice(0, 120),
+        email: (localEntry.email || '').slice(0, 160),
+        phone: (localEntry.phone || '').slice(0, 40),
+        interest: (localEntry.specificProductOrInterest || localEntry.enquiryType || 'General Enquiry').slice(0, 100),
+        message: (localEntry.message || '').slice(0, 3000),
+        submittedAt: localEntry.createdAt,
+        status: 'new',
+      });
+    } catch (err) {
+      console.warn('Direct Firestore submission sync:', err);
+    }
 
     try {
       await fetch('/api/enquiries', {

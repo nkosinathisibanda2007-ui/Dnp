@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, ExternalLink, ShieldCheck, Compass, Layers, Info, CheckCircle2 } from 'lucide-react';
 import { useCms } from '../context/CmsContext';
 import { FarmLocation } from '../types';
+import { GoogleMapsHubView } from './GoogleMapsHubView';
 
 interface ZimbabweMapProps {
   onSelectLocation?: (location: FarmLocation) => void;
@@ -219,23 +220,13 @@ export const ZimbabweMap: React.FC<ZimbabweMapProps> = ({
               })}
             </div>
           ) : (
-            /* Google Maps Preview Embed based on current selected coordinates */
-            <div className="w-full h-full min-h-[380px] rounded-xl overflow-hidden border border-[#ded8c4] shadow-inner relative">
-              <iframe
-                title={`Google Map - ${selectedLocation.name} Hub`}
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                scrolling="no"
-                marginHeight={0}
-                marginWidth={0}
-                src={`https://maps.google.com/maps?q=${selectedLocation.coordinates.lat},${selectedLocation.coordinates.lng}&z=11&output=embed`}
-                className="w-full h-full min-h-[380px]"
+            /* Modern Google Maps Platform integration with Advanced Markers and location sync */
+            <div className="w-full h-full min-h-[380px] sm:min-h-[460px] relative">
+              <GoogleMapsHubView
+                locations={data.locations}
+                selectedLocId={selectedLocId}
+                onSelectLocation={handlePinClick}
               />
-              <div className="absolute bottom-3 left-3 bg-[#1b2e20]/90 text-white text-[11px] px-3 py-1.5 rounded-md backdrop-blur-xs flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#d39c4a]" />
-                <span>Showing regional vicinity of {selectedLocation.name} Hub</span>
-              </div>
             </div>
           )}
 
