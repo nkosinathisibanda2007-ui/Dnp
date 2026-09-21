@@ -54,7 +54,7 @@ export const ContactView: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Confirmed Contact Information Column */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#faf9f5] border border-[#ded8c4] space-y-6">
+            <div className="p-6 sm:p-8 rounded-3xl bg-[#faf9f5] space-y-6 shadow-xs">
               <div>
                 <span className="text-xs font-semibold uppercase tracking-widest text-[#996f2a]">
                   Corporate Office & Hubs
@@ -65,7 +65,7 @@ export const ContactView: React.FC = () => {
               </div>
 
               <div className="space-y-4 text-xs sm:text-sm text-[#38443b]">
-                <div className="flex items-start gap-3 p-3.5 rounded-xl bg-[#f2efe4] border border-[#ded7c2]">
+                <div className="flex items-start gap-3 p-4 rounded-2xl bg-white shadow-xs">
                   <Building2 className="w-5 h-5 text-[#8b6527] shrink-0 mt-0.5" />
                   <div>
                     <span className="font-semibold text-[#18261b] block">Corporate Desk</span>
@@ -74,7 +74,7 @@ export const ContactView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3.5 rounded-xl bg-[#f2efe4] border border-[#ded7c2]">
+                <div className="flex items-start gap-3 p-4 rounded-2xl bg-white shadow-xs">
                   <Mail className="w-5 h-5 text-[#8b6527] shrink-0 mt-0.5" />
                   <div>
                     <span className="font-semibold text-[#18261b] block">Electronic Mail Desks</span>
@@ -83,7 +83,7 @@ export const ContactView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3.5 rounded-xl bg-[#f2efe4] border border-[#ded7c2]">
+                <div className="flex items-start gap-3 p-4 rounded-2xl bg-white shadow-xs">
                   <MapPin className="w-5 h-5 text-[#8b6527] shrink-0 mt-0.5" />
                   <div>
                     <span className="font-semibold text-[#18261b] block">Strategic Agricultural Hubs</span>
@@ -93,7 +93,7 @@ export const ContactView: React.FC = () => {
               </div>
 
               {/* Verified Contact Discipline Notice */}
-              <div className="p-3.5 rounded-lg bg-[#ede7d5] border border-[#d6cdb7] text-xs text-[#544d3d] space-y-1">
+              <div className="p-4 rounded-2xl bg-[#ede7d5] text-xs text-[#544d3d] space-y-1">
                 <span className="font-bold text-[#18261b] flex items-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-[#996f2a]" />
                   <span>Phone Numbers Confirmation</span>
@@ -107,7 +107,7 @@ export const ContactView: React.FC = () => {
 
           {/* Direct Enquiry Form Column */}
           <div className="lg:col-span-7">
-            <div className="p-6 sm:p-10 rounded-2xl bg-[#faf9f5] border border-[#ded8c4] shadow-xs">
+            <div className="p-6 sm:p-10 rounded-3xl bg-white shadow-xs">
               {isSubmitted ? (
                 <div className="text-center py-12 space-y-4">
                   <div className="w-14 h-14 mx-auto rounded-full bg-[#1b2e20] text-white flex items-center justify-center shadow-lg">
@@ -133,7 +133,7 @@ export const ContactView: React.FC = () => {
                         message: '',
                       });
                     }}
-                    className="mt-4 px-6 py-2.5 bg-[#1b2e20] text-white text-xs font-semibold rounded-lg hover:bg-[#122016] transition-colors"
+                    className="mt-4 px-6 py-2.5 bg-[#1b2e20] text-white text-xs font-semibold rounded-lg hover:bg-[#122016] transition-colors cursor-pointer"
                   >
                     Submit Another Inquiry
                   </button>
@@ -166,10 +166,10 @@ export const ContactView: React.FC = () => {
                           key={cat.id}
                           type="button"
                           onClick={() => setFormData({ ...formData, enquiryType: cat.id as any })}
-                          className={`px-3 py-2 text-xs font-medium rounded-lg border text-left transition-all ${
+                          className={`px-3 py-2 text-xs font-medium rounded-xl text-left transition-all cursor-pointer ${
                             formData.enquiryType === cat.id
-                              ? 'bg-[#1b2e20] text-[#faf9f5] border-[#1b2e20] shadow-xs'
-                              : 'bg-[#faf9f5] text-[#4d4638] border-[#ded8c4] hover:bg-[#ede8d8]'
+                              ? 'bg-[#1b2e20] text-[#faf9f5] shadow-xs'
+                              : 'bg-[#f4f7f0] text-[#4d4638] hover:bg-[#ede8d8]'
                           }`}
                         >
                           {cat.label}
@@ -188,7 +188,7 @@ export const ContactView: React.FC = () => {
                       value={formData.specificProductOrInterest}
                       onChange={(e) => setFormData({ ...formData, specificProductOrInterest: e.target.value })}
                       placeholder="e.g. Commercial Maize Bulk Quota, Norton Pivot Visit, Macadamia Seedling Order"
-                      className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-white border border-[#ded8c4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
+                      className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#faf9f6] border border-[#e5e0d4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
                     />
                   </div>
 
@@ -204,7 +204,7 @@ export const ContactView: React.FC = () => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         placeholder="Enter full name"
-                        className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-white border border-[#ded8c4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
+                        className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#faf9f6] border border-[#e5e0d4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
                       />
                     </div>
                     <div>
@@ -216,7 +216,7 @@ export const ContactView: React.FC = () => {
                         value={formData.organization}
                         onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
                         placeholder="Off-taker, Miller, or Farm name"
-                        className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-white border border-[#ded8c4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
+                        className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#faf9f6] border border-[#e5e0d4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
                       />
                     </div>
                   </div>
@@ -233,7 +233,7 @@ export const ContactView: React.FC = () => {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         placeholder="name@company.com"
-                        className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-white border border-[#ded8c4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
+                        className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#faf9f6] border border-[#e5e0d4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
                       />
                     </div>
                     <div>
@@ -245,7 +245,7 @@ export const ContactView: React.FC = () => {
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="+263 ..."
-                        className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-white border border-[#ded8c4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
+                        className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#faf9f6] border border-[#e5e0d4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
                       />
                     </div>
                   </div>
@@ -261,7 +261,7 @@ export const ContactView: React.FC = () => {
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       placeholder="Specify requested tonnage, required harvest window, location, or questions..."
-                      className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-white border border-[#ded8c4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
+                      className="w-full px-3 py-2 text-xs sm:text-sm rounded-lg bg-[#faf9f6] border border-[#e5e0d4] text-[#1c241e] placeholder-[#948d7d] focus:outline-hidden focus:border-[#1b2e20]"
                     />
                   </div>
 
@@ -272,7 +272,7 @@ export const ContactView: React.FC = () => {
                     </span>
                     <button
                       type="submit"
-                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1b2e20] hover:bg-[#122016] text-[#faf9f5] text-xs sm:text-sm font-semibold rounded-lg shadow-md transition-all"
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#1b2e20] hover:bg-[#122016] text-[#faf9f5] text-xs sm:text-sm font-semibold rounded-lg shadow-md transition-all cursor-pointer"
                     >
                       <Send className="w-4 h-4" />
                       <span>Transmit Enquiry</span>

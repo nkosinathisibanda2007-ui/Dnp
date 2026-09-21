@@ -5,14 +5,14 @@ import { ZimbabweMap } from '../components/ZimbabweMap';
 import { MediaFrame } from '../components/MediaFrame';
 
 export const LocationsView: React.FC = () => {
-  const { data, openEnquiryModal, setIsAdminOpen } = useCms();
+  const { data, openEnquiryModal } = useCms();
 
   return (
     <div className="space-y-16 sm:space-y-24 pb-24">
       {/* Header */}
       <section className="pt-12 sm:pt-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-[#ede8d8] text-[#785923] text-xs font-semibold tracking-wider uppercase">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ede8d8] text-[#785923] text-xs font-semibold tracking-wider uppercase">
             <span>National Operational Footprint</span>
           </div>
           <h1 className="text-4xl sm:text-5xl font-serif font-bold text-[#142217] tracking-tight">
@@ -24,7 +24,7 @@ export const LocationsView: React.FC = () => {
         </div>
 
         {/* Legal & Data Integrity Banner */}
-        <div className="mt-8 p-4 rounded-xl bg-[#ede7d5] border border-[#d6cdb7] text-xs sm:text-sm text-[#473f30] flex items-start gap-3 shadow-2xs">
+        <div className="mt-8 p-4 rounded-2xl bg-[#f2eee1] text-xs sm:text-sm text-[#473f30] flex items-start gap-3 shadow-2xs">
           <ShieldCheck className="w-5 h-5 text-[#996f2a] shrink-0 mt-0.5" />
           <div className="space-y-1">
             <span className="font-bold text-[#18261b] block">Confirmed Regional Hub Placement</span>
@@ -42,7 +42,7 @@ export const LocationsView: React.FC = () => {
 
       {/* Deep Location Cards Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="border-b border-[#ded8c4] pb-4">
+        <div className="pb-2">
           <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#152218]">
             Hub Profiles & Agronomic Specialization
           </h2>
@@ -55,7 +55,7 @@ export const LocationsView: React.FC = () => {
           {data.locations.map((loc) => (
             <div
               key={loc.id}
-              className="rounded-2xl bg-[#faf9f5] border border-[#ded8c4] overflow-hidden flex flex-col justify-between hover:shadow-md transition-all space-y-4"
+              className="rounded-2xl bg-white shadow-xs overflow-hidden flex flex-col justify-between hover:shadow-md transition-all space-y-4"
             >
               <div>
                 <MediaFrame
@@ -79,7 +79,7 @@ export const LocationsView: React.FC = () => {
                     {loc.name} Farming Hub
                   </h3>
 
-                  <div className="p-2.5 rounded-md bg-[#ede8d8] text-xs font-medium text-[#5c4e33]">
+                  <div className="p-2.5 rounded-lg bg-[#f6f3eb] text-xs font-medium text-[#5c4e33]">
                     {loc.agroEcologicalZone}
                   </div>
 
@@ -87,7 +87,7 @@ export const LocationsView: React.FC = () => {
                     {loc.summary}
                   </p>
 
-                  <div className="space-y-2 pt-2 border-t border-[#ded8c4]">
+                  <div className="space-y-2 pt-2 border-t border-[#f0ebe0]">
                     <span className="text-[11px] font-semibold uppercase tracking-wider text-[#18261b] block">
                       Primary Cultivation & Rearing Focus:
                     </span>
@@ -101,7 +101,7 @@ export const LocationsView: React.FC = () => {
                     </ul>
                   </div>
 
-                  <div className="p-3 rounded-lg bg-[#f3efe4] border border-[#ded7c4] text-xs text-[#524b3c]">
+                  <div className="p-3.5 rounded-xl bg-[#f7f5ed] text-xs text-[#524b3c]">
                     <span className="font-semibold text-[#18261b] block mb-0.5 text-[11px] uppercase tracking-wider">
                       Infrastructure Deployed:
                     </span>
@@ -111,7 +111,7 @@ export const LocationsView: React.FC = () => {
               </div>
 
               {/* Bottom Actions */}
-              <div className="px-6 sm:px-8 pb-6 pt-2 border-t border-[#ded8c4] flex flex-wrap items-center justify-between gap-3">
+              <div className="px-6 sm:px-8 pb-6 pt-3 border-t border-[#f0ebe0] flex flex-wrap items-center justify-between gap-3">
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${loc.coordinates.lat},${loc.coordinates.lng}`}
                   target="_blank"
@@ -125,15 +125,8 @@ export const LocationsView: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => setIsAdminOpen(true)}
-                    className="px-2.5 py-1 text-xs text-[#5c5443] border border-[#ded8c4] rounded-md hover:bg-[#ede8d8]"
-                  >
-                    Edit in CMS
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => openEnquiryModal('partnership', `${loc.name} Hub Partnership`)}
-                    className="px-3.5 py-1.5 bg-[#1b2e20] hover:bg-[#122016] text-[#faf9f5] text-xs font-semibold rounded-md shadow-2xs transition-colors flex items-center gap-1"
+                    className="px-4 py-2 bg-[#1b2e20] hover:bg-[#122016] text-[#faf9f5] text-xs font-semibold rounded-lg shadow-xs transition-colors flex items-center gap-1"
                   >
                     <span>Enquire for {loc.name}</span>
                     <ArrowUpRight className="w-3.5 h-3.5 text-[#e5a952]" />

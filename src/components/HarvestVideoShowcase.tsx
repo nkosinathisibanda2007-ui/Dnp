@@ -182,6 +182,7 @@ export const HarvestVideoShowcase: React.FC = () => {
               <img
                 src={posterSources.field_operation}
                 alt="Grain field"
+                referrerPolicy="no-referrer"
                 className="absolute inset-0 w-full h-full object-cover opacity-25 filter blur-xs"
               />
               <GrainParticleCanvas density="rich" interactive={true} />

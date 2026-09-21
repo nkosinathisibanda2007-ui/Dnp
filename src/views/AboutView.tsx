@@ -68,7 +68,7 @@ export const AboutView: React.FC = () => {
       {/* 3. Vision & Mission Cards */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="p-8 sm:p-10 rounded-2xl bg-[#faf9f5] border border-[#ded8c4] space-y-4 shadow-xs">
+          <div className="p-8 sm:p-10 rounded-3xl bg-[#faf9f5] space-y-4 shadow-xs">
             <div className="w-12 h-12 rounded-xl bg-[#ede8d8] flex items-center justify-center text-[#785923]">
               <Target className="w-6 h-6 text-[#9a7029]" />
             </div>
@@ -83,7 +83,7 @@ export const AboutView: React.FC = () => {
             </p>
           </div>
 
-          <div className="p-8 sm:p-10 rounded-2xl bg-[#faf9f5] border border-[#ded8c4] space-y-4 shadow-xs">
+          <div className="p-8 sm:p-10 rounded-3xl bg-[#faf9f5] space-y-4 shadow-xs">
             <div className="w-12 h-12 rounded-xl bg-[#ede8d8] flex items-center justify-center text-[#785923]">
               <Sprout className="w-6 h-6 text-[#9a7029]" />
             </div>
@@ -102,7 +102,7 @@ export const AboutView: React.FC = () => {
 
       {/* 3.5 OFFICIAL BRAND SEAL & CORPORATE INSIGNIA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-[#0f1a11] text-[#f7f5ef] border border-[#273d2b] p-8 sm:p-12 shadow-xl overflow-hidden relative">
+        <div className="rounded-3xl bg-[#0f1a11] text-[#f7f5ef] p-8 sm:p-12 shadow-xl overflow-hidden relative">
           {/* Subtle background glow */}
           <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-[#d4af37]/10 blur-3xl pointer-events-none" />
 
@@ -138,7 +138,7 @@ export const AboutView: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+                <div className="p-4 rounded-xl bg-white/5 space-y-1.5">
                   <h4 className="font-serif font-bold text-sm text-[#e5a952] flex items-center gap-2">
                     <span>1. 'DF' Monogram & Arched Titles</span>
                   </h4>
@@ -147,7 +147,7 @@ export const AboutView: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+                <div className="p-4 rounded-xl bg-white/5 space-y-1.5">
                   <h4 className="font-serif font-bold text-sm text-[#e5a952] flex items-center gap-2">
                     <span>2. The Rising Sun & Peaks</span>
                   </h4>
@@ -156,7 +156,7 @@ export const AboutView: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+                <div className="p-4 rounded-xl bg-white/5 space-y-1.5">
                   <h4 className="font-serif font-bold text-sm text-[#e5a952] flex items-center gap-2">
                     <span>3. Furrowed Agricultural Lands</span>
                   </h4>
@@ -165,7 +165,7 @@ export const AboutView: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-1.5">
+                <div className="p-4 rounded-xl bg-white/5 space-y-1.5">
                   <h4 className="font-serif font-bold text-sm text-[#e5a952] flex items-center gap-2">
                     <span>4. Triple Golden Grain Ears</span>
                   </h4>
@@ -198,7 +198,7 @@ export const AboutView: React.FC = () => {
       </section>
 
       {/* 4. The 5 Pillars: Our Approach */}
-      <section className="bg-[#f5f2e8] py-16 border-y border-[#ded8c4]">
+      <section className="bg-[#f7f9f2] py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
           <div className="max-w-3xl space-y-2">
             <span className="text-xs font-semibold uppercase tracking-widest text-[#996f2a]">
@@ -216,7 +216,7 @@ export const AboutView: React.FC = () => {
             {about.fivePillars.map((pillar, idx) => (
               <div
                 key={idx}
-                className="p-6 rounded-2xl bg-[#faf9f5] border border-[#ded8c4] space-y-3"
+                className="p-6 rounded-2xl bg-white shadow-xs space-y-3"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold text-[#996f2a] px-2 py-0.5 rounded bg-[#ede8d8]">
@@ -241,7 +241,7 @@ export const AboutView: React.FC = () => {
 
       {/* 5. Corporate Values & Biosecurity Commitment */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-8 sm:p-12 rounded-2xl bg-[#1a2d1f] text-[#fbfbfa] border border-[#2b4731]">
+        <div className="p-8 sm:p-12 rounded-3xl bg-[#1a2d1f] text-[#fbfbfa] shadow-lg">
           <div className="max-w-3xl space-y-3 mb-10">
             <span className="text-xs font-semibold uppercase tracking-widest text-[#e5a952]">
               Corporate Governance
@@ -256,7 +256,7 @@ export const AboutView: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {about.corporateValues.map((val, idx) => (
-              <div key={idx} className="p-5 rounded-xl bg-[#233827] border border-[#34523a] space-y-2">
+              <div key={idx} className="p-5 rounded-xl bg-[#233827] space-y-2">
                 <span className="text-xs font-bold text-[#e5a952] block">0{idx + 1}</span>
                 <h4 className="font-serif font-bold text-base text-white">{val.title}</h4>
                 <p className="text-xs text-[#9eb1a0] leading-relaxed">{val.description}</p>

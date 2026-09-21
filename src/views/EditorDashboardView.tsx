@@ -590,6 +590,7 @@ export const EditorDashboardView: React.FC = () => {
                             <img
                               src={product.primaryImageUrl}
                               alt={product.name}
+                              referrerPolicy="no-referrer"
                               className="w-12 h-12 rounded-lg object-cover border border-white/10"
                             />
                           ) : (
@@ -1344,7 +1345,12 @@ export const EditorDashboardView: React.FC = () => {
                         slot.url.includes('.mp4') || slot.url.includes('.webm') ? (
                           <video src={slot.url} className="w-full h-full object-cover" muted />
                         ) : (
-                          <img src={slot.url} alt={slot.altText || id} className="w-full h-full object-cover" />
+                          <img
+                            src={slot.url}
+                            alt={slot.altText || id}
+                            referrerPolicy="no-referrer"
+                            className="w-full h-full object-cover"
+                          />
                         )
                       ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center text-[#556d58] text-[11px]">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, Search, ArrowUpRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useCms } from '../context/CmsContext';
 import { ProductCategory } from '../types';
+import { getProductImageUrl, getProductImageAlt } from '../utils/imageAssets';
 
 export const ProductsView: React.FC = () => {
   const { data, openEnquiryModal } = useCms();
@@ -46,7 +47,7 @@ export const ProductsView: React.FC = () => {
         </div>
 
         {/* Mandatory Availability Disclaimer */}
-        <div className="mt-8 p-4 rounded-xl bg-[#ede7d5] border border-[#d6cdb7] text-xs sm:text-sm text-[#473f30] flex items-start gap-3 shadow-2xs">
+        <div className="mt-8 p-4 rounded-2xl bg-[#f2eee1] text-xs sm:text-sm text-[#473f30] flex items-start gap-3 shadow-2xs">
           <ShieldCheck className="w-5 h-5 text-[#996f2a] shrink-0 mt-0.5" />
           <div className="space-y-1">
             <span className="font-bold text-[#18261b] block">Production Cycle Availability Policy</span>
@@ -77,7 +78,7 @@ export const ProductsView: React.FC = () => {
                 className={`px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                   selectedCategory === cat.id
                     ? 'bg-[#1b2e20] text-white shadow-xs'
-                    : 'bg-[#faf9f5] text-[#524b3c] border border-[#ded8c4] hover:bg-[#ede8d8]'
+                    : 'bg-[#ede8d8] text-[#524b3c] hover:bg-[#e4ddcc]'
                 }`}
               >
                 {cat.label}
@@ -93,14 +94,14 @@ export const ProductsView: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products..."
-              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-white border border-[#ded8c4] text-[#1a221d] placeholder-[#968f80] focus:outline-hidden focus:border-[#1b2e20]"
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-lg bg-white shadow-2xs text-[#1a221d] placeholder-[#968f80] focus:outline-hidden focus:ring-2 focus:ring-[#1b2e20]/20"
             />
           </div>
         </div>
 
         {/* Sub-Category Pills (if more than 1) */}
         {subCategories.length > 1 && (
-          <div className="mt-4 flex flex-wrap items-center gap-1.5 pt-3 border-t border-[#e5dfd1]">
+          <div className="mt-4 flex flex-wrap items-center gap-1.5 pt-3 border-t border-[#ede7d8]">
             <span className="text-[11px] text-[#716956] mr-1 font-medium">Filter Sub-Category:</span>
             <button
               type="button"
@@ -134,7 +135,7 @@ export const ProductsView: React.FC = () => {
       {/* Products Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {filteredProducts.length === 0 ? (
-          <div className="p-12 text-center rounded-2xl bg-[#faf9f5] border border-[#ded8c4] text-[#696150] space-y-2">
+          <div className="p-12 text-center rounded-2xl bg-white shadow-xs text-[#696150] space-y-2">
             <p className="font-serif font-bold text-lg text-[#1b2e20]">No products matching criteria</p>
             <p className="text-xs">Try clearing your search query or selecting another category.</p>
           </div>
@@ -142,77 +143,98 @@ export const ProductsView: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProducts.map((product) => {
               const isInProduction = product.status === 'in_production';
+              const imageUrl = getProductImageUrl(product);
+              const imageAlt = getProductImageAlt(product);
 
               return (
                 <div
                   key={product.id}
-                  className="rounded-2xl bg-[#faf9f5] border border-[#ded8c4] p-6 flex flex-col justify-between hover:shadow-md transition-all space-y-4"
+                  className="rounded-2xl bg-white shadow-xs overflow-hidden flex flex-col justify-between hover:shadow-md transition-all group"
                 >
-                  <div className="space-y-3">
-                    {/* Header Badges */}
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#8b6527] bg-[#ede8d8] px-2.5 py-0.5 rounded">
+                  {/* Authentic Product Photo */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#e8e4d8]">
+                    <img
+                      src={imageUrl}
+                      alt={imageAlt}
+                      referrerPolicy="no-referrer"
+                      loading="lazy"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.dataset.fallback) {
+                          target.dataset.fallback = 'true';
+                          target.src = 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1200&auto=format&fit=crop';
+                        }
+                      }}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {/* Overlay Badges */}
+                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#142217] bg-white/95 backdrop-blur-xs px-2.5 py-1 rounded shadow-2xs">
                         {product.subCategory}
                       </span>
 
                       <span
-                        className={`text-[10px] px-2 py-0.5 rounded font-medium ${
+                        className={`text-[10px] px-2.5 py-1 rounded font-semibold shadow-2xs ${
                           isInProduction
-                            ? 'bg-[#e4ede5] text-[#2b5934] border border-[#c3d8c6]'
-                            : 'bg-[#faf0e1] text-[#85531d] border border-[#edd5b9]'
+                            ? 'bg-[#1b2e20]/90 text-white backdrop-blur-xs'
+                            : 'bg-[#996f2a]/90 text-white backdrop-blur-xs'
                         }`}
                       >
                         {isInProduction ? 'Current Production' : 'Developing Activity'}
                       </span>
                     </div>
-
-                    <h3 className="text-xl font-serif font-bold text-[#152218]">
-                      {product.name}
-                    </h3>
-
-                    <p className="text-xs sm:text-[13px] text-[#424d45] leading-relaxed">
-                      {product.description}
-                    </p>
-
-                    {/* Availability Note */}
-                    <div className="p-3 rounded-lg bg-[#f3efe4] border border-[#ded7c4] text-xs text-[#524b3c] space-y-1">
-                      <span className="font-semibold text-[#18261b] block text-[11px] uppercase tracking-wider">
-                        Production Cycle & Timing:
-                      </span>
-                      <p>{product.availabilityNote}</p>
-                    </div>
-
-                    {/* Specifications if present */}
-                    {product.specifications && product.specifications.length > 0 && (
-                      <div className="space-y-1 pt-1">
-                        <span className="text-[10px] font-semibold uppercase tracking-wider text-[#736a57] block">
-                          Commercial Specs:
-                        </span>
-                        <ul className="space-y-1">
-                          {product.specifications.map((spec, sIdx) => (
-                            <li key={sIdx} className="text-xs text-[#454f47] flex items-center gap-1.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-[#c48a39]" />
-                              <span>{spec}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Bottom Action */}
-                  <div className="pt-4 border-t border-[#ded8c4] flex items-center justify-between">
-                    <span className="text-[11px] text-[#78705f]">
-                      {isInProduction ? 'Active Cycle' : 'Pre-order / Pilot'}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => openEnquiryModal('products', product.name)}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1b2e20] hover:bg-[#122016] text-[#faf9f5] text-xs font-semibold rounded-md shadow-2xs transition-colors"
-                    >
-                      <span>Enquire / Reserve</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-[#e5a952]" />
-                    </button>
+                  <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                    <div className="space-y-3">
+                      <h3 className="text-xl font-serif font-bold text-[#152218]">
+                        {product.name}
+                      </h3>
+
+                      <p className="text-xs sm:text-[13px] text-[#424d45] leading-relaxed">
+                        {product.description}
+                      </p>
+
+                      {/* Availability Note */}
+                      <div className="p-3.5 rounded-xl bg-[#f7f5ee] text-xs text-[#524b3c] space-y-1">
+                        <span className="font-semibold text-[#18261b] block text-[11px] uppercase tracking-wider">
+                          Production Cycle & Timing:
+                        </span>
+                        <p>{product.availabilityNote}</p>
+                      </div>
+
+                      {/* Specifications if present */}
+                      {product.specifications && product.specifications.length > 0 && (
+                        <div className="space-y-1 pt-1">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#736a57] block">
+                            Commercial Specs:
+                          </span>
+                          <ul className="space-y-1">
+                            {product.specifications.map((spec, sIdx) => (
+                              <li key={sIdx} className="text-xs text-[#454f47] flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#c48a39]" />
+                                <span>{spec}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bottom Action */}
+                    <div className="pt-4 border-t border-[#f2eee3] flex items-center justify-between mt-auto">
+                      <span className="text-[11px] text-[#78705f]">
+                        {isInProduction ? 'Active Cycle' : 'Pre-order / Pilot'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => openEnquiryModal('products', product.name)}
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1b2e20] hover:bg-[#122016] text-[#faf9f5] text-xs font-semibold rounded-md shadow-2xs transition-colors cursor-pointer"
+                      >
+                        <span>Enquire / Reserve</span>
+                        <ArrowUpRight className="w-3.5 h-3.5 text-[#e5a952]" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               );

@@ -1,11 +1,11 @@
 import React from 'react';
-import { MapPin, Mail, ArrowUpRight, ShieldCheck, Globe, SlidersHorizontal, Sprout } from 'lucide-react';
+import { MapPin, Mail, ArrowUpRight, ShieldCheck, Globe, Sprout } from 'lucide-react';
 import { useCms } from '../context/CmsContext';
 import { PageRoute } from '../types';
 import { DzinoponaLogo } from './DzinoponaLogo';
 
 export const Footer: React.FC = () => {
-  const { data, setActiveRoute, setIsAdminOpen, openEnquiryModal, setIsSeoModalOpen, navigateTo } = useCms();
+  const { data, setActiveRoute, openEnquiryModal, setIsSeoModalOpen } = useCms();
 
   const handleNav = (route: PageRoute) => {
     setActiveRoute(route);
@@ -150,7 +150,7 @@ export const Footer: React.FC = () => {
               </div>
 
               {/* Technical / SEO actions */}
-              <div className="pt-2 flex flex-wrap items-center gap-3 text-xs text-[#8ea391]">
+              <div className="pt-2 flex flex-wrap items-center gap-4 text-xs text-[#8ea391]">
                 <button
                   type="button"
                   onClick={() => setIsSeoModalOpen(true)}

@@ -1,13 +1,20 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { initializeFirestore, doc, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase App
 export const app = initializeApp(firebaseConfig);
 
-// Initialize Firestore with the provisioned database ID
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+// Initialize Firestore with the provisioned database ID and enable long-polling
+// to prevent 10-second backend timeout issues in proxy and iframe environments
+export const db = initializeFirestore(
+  app,
+  {
+    experimentalForceLongPolling: true,
+  },
+  firebaseConfig.firestoreDatabaseId
+);
 
 // Initialize Firebase Authentication
 export const auth = getAuth(app);
@@ -15,14 +22,21 @@ export const auth = getAuth(app);
 // Connection test on boot as required by Firebase integration standards
 async function testConnection() {
   try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Connection timed out')), 5000)
+    );
+    await Promise.race([
+      getDocFromServer(doc(db, 'test', 'connection')),
+      timeoutPromise,
+    ]);
   } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.warn('Firebase client is offline or configuration requires review.');
+    if (error instanceof Error && (error.message.includes('offline') || error.message.includes('timed out'))) {
+      console.warn('Firebase client operating in offline/cached mode.');
     }
   }
 }
 testConnection();
+
 
 // Standardized Operation Types for strict Firestore error reporting
 export enum OperationType {

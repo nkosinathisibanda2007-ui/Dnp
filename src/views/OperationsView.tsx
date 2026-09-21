@@ -55,16 +55,16 @@ export const OperationsView: React.FC = () => {
         </div>
 
         {/* Filter Pills */}
-        <div className="mt-8 flex flex-wrap items-center gap-2 pb-2 border-b border-[#e2dcce]">
+        <div className="mt-8 flex flex-wrap items-center gap-2 pb-2">
           {filterCategories.map((filter) => (
             <button
               key={filter.id}
               type="button"
               onClick={() => setSelectedFilter(filter.id)}
-              className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
+              className={`px-3.5 py-1.5 text-xs font-medium rounded-full transition-all ${
                 selectedFilter === filter.id
                   ? 'bg-[#1b2e20] text-white shadow-xs'
-                  : 'bg-[#faf9f5] text-[#554e3d] border border-[#ded8c4] hover:bg-[#ede8d8]'
+                  : 'bg-[#faf9f5] text-[#554e3d] hover:bg-[#ede8d8]'
               }`}
             >
               {filter.label}
@@ -83,7 +83,7 @@ export const OperationsView: React.FC = () => {
             return (
               <div
                 key={op.id}
-                className="rounded-2xl bg-[#faf9f5] border border-[#ded8c4] overflow-hidden shadow-xs hover:border-[#b8ae93] transition-colors"
+                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 sm:p-8 items-center ${isEven ? 'lg:flex-row-reverse' : ''}`}>
                   {/* Media Frame */}
@@ -99,16 +99,16 @@ export const OperationsView: React.FC = () => {
                   {/* Content Column */}
                   <div className={`lg:col-span-7 space-y-4 ${isEven ? 'lg:order-1' : 'lg:order-2'}`}>
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider text-[#8b6527] bg-[#ede8d8] px-2.5 py-1 rounded">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-[#8b6527] bg-[#ede8d8] px-2.5 py-1 rounded-md">
                         {op.category.replace(/_/g, ' ')}
                       </span>
                       <span
-                        className={`text-xs px-2.5 py-0.5 rounded font-medium capitalize ${
+                        className={`text-xs px-2.5 py-0.5 rounded-full font-medium capitalize ${
                           op.status === 'active'
-                            ? 'bg-[#e3eee4] text-[#24542d] border border-[#c1d9c4]'
+                            ? 'bg-[#e3eee4] text-[#24542d]'
                             : op.status === 'expanding'
-                            ? 'bg-[#e8f0f8] text-[#1e4d7d] border border-[#c8daf0]'
-                            : 'bg-[#faf0e1] text-[#85531d] border border-[#edd5b9]'
+                            ? 'bg-[#e8f0f8] text-[#1e4d7d]'
+                            : 'bg-[#faf0e1] text-[#85531d]'
                         }`}
                       >
                         ● {op.status} Phase
@@ -124,7 +124,7 @@ export const OperationsView: React.FC = () => {
                     </p>
 
                     {/* Key Technical Highlights */}
-                    <div className="space-y-2 pt-2 border-t border-[#e8e2d2]">
+                    <div className="space-y-2 pt-2 border-t border-[#f0f4ea]">
                       <span className="text-[11px] font-semibold uppercase tracking-wider text-[#18261b] block">
                         Core Operational Parameters:
                       </span>
@@ -140,7 +140,7 @@ export const OperationsView: React.FC = () => {
 
                     {/* Expandable Agronomic Detail */}
                     {isExpanded && (
-                      <div className="p-4 rounded-xl bg-[#f2efe4] border border-[#ded7c2] text-xs sm:text-[13px] text-[#333e36] leading-relaxed space-y-2 animate-fadeIn">
+                      <div className="p-4 rounded-xl bg-[#f5f8f2] text-xs sm:text-[13px] text-[#333e36] leading-relaxed space-y-2 animate-fadeIn">
                         <span className="font-semibold text-[#18261b] block uppercase text-[10px] tracking-wider">
                           Full Agronomic & Operational Mandate:
                         </span>
@@ -153,7 +153,7 @@ export const OperationsView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => toggleExpand(op.id)}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6e5323] hover:text-[#423112] underline underline-offset-4"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#6e5323] hover:text-[#423112] underline underline-offset-4 cursor-pointer"
                       >
                         <span>{isExpanded ? 'Collapse Overview' : 'View Full Operational Narrative'}</span>
                         {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -162,7 +162,7 @@ export const OperationsView: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => openEnquiryModal('partnership', `${op.title} Commercial Engagement`)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1b2e20] hover:bg-[#122016] text-[#faf9f5] text-xs font-semibold rounded-lg shadow-xs transition-colors"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1b2e20] hover:bg-[#122016] text-[#faf9f5] text-xs font-semibold rounded-xl shadow-xs transition-colors cursor-pointer"
                       >
                         <span>Commercial Enquiry</span>
                         <ArrowUpRight className="w-3.5 h-3.5 text-[#e5a952]" />

@@ -15,7 +15,7 @@ export const ZimbabweMap: React.FC<ZimbabweMapProps> = ({
   className = '',
   showFullDetailsCard = true,
 }) => {
-  const { data, openEnquiryModal, setIsAdminOpen } = useCms();
+  const { data, openEnquiryModal } = useCms();
   const [selectedLocId, setSelectedLocId] = useState<string>(data.locations[0]?.id || 'loc-norton');
   const [mapMode, setMapMode] = useState<'cartographic' | 'satellite_embed'>('cartographic');
 
@@ -304,14 +304,14 @@ export const ZimbabweMap: React.FC<ZimbabweMapProps> = ({
               </div>
 
               {/* Infrastructure */}
-              <div className="p-3 rounded-lg bg-[#f3efe4] border border-[#ded7c4] text-xs text-[#524b3c]">
+              <div className="p-3.5 rounded-xl bg-[#f2eee3] text-xs text-[#524b3c]">
                 <span className="font-semibold text-[#18261b] block mb-0.5">Infrastructure Deployed:</span>
                 {selectedLocation.infrastructureOverview}
               </div>
             </div>
 
             {/* Actions */}
-            <div className="pt-5 border-t border-[#e2dcce] flex flex-wrap items-center justify-between gap-3 mt-4">
+            <div className="pt-4 border-t border-[#eae5d8] flex flex-wrap items-center justify-between gap-3 mt-4">
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${selectedLocation.coordinates.lat},${selectedLocation.coordinates.lng}`}
                 target="_blank"
@@ -325,15 +325,8 @@ export const ZimbabweMap: React.FC<ZimbabweMapProps> = ({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setIsAdminOpen(true)}
-                  className="px-2.5 py-1.5 text-xs text-[#605847] hover:text-[#18261b] border border-[#ded8c4] rounded-md hover:bg-[#ede8d8] transition-colors"
-                >
-                  Edit in CMS
-                </button>
-                <button
-                  type="button"
                   onClick={() => openEnquiryModal('partnership', `${selectedLocation.name} Hub Partnership`)}
-                  className="px-3.5 py-1.5 text-xs font-semibold text-white bg-[#1b2e20] hover:bg-[#122016] rounded-md shadow-xs transition-colors"
+                  className="px-4 py-2 text-xs font-semibold text-white bg-[#1b2e20] hover:bg-[#122016] rounded-lg shadow-xs transition-colors"
                 >
                   Enquire for {selectedLocation.name}
                 </button>

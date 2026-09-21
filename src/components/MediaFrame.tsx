@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Camera, SlidersHorizontal, Check, Sparkles, AlertCircle, Upload, Film } from 'lucide-react';
 import { useCms } from '../context/CmsContext';
 import { MediaSlot } from '../types';
+import { DEFAULT_SLOT_IMAGE_MAP } from '../utils/imageAssets';
 
 interface MediaFrameProps {
   slotId: string;
@@ -20,11 +21,11 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
   className = '',
   badgeText,
   caption,
-  showAdminQuickAction = true,
+  showAdminQuickAction = false,
   priority = false,
   children,
 }) => {
-  const { data, assignMediaUrl, updateMediaSlot, authStatus, uploadMediaFile } = useCms();
+  const { data, assignMediaUrl, updateMediaSlot, authStatus, uploadMediaFile, activeRoute } = useCms();
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -38,7 +39,12 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
     isCustomUploaded: false,
   };
 
-  const [tempUrl, setTempUrl] = useState(slot.url || '');
+  // Resolve authentic URL from slot or verified defaults
+  const resolvedUrl = (slot.url && !slot.url.includes('wikimedia.org'))
+    ? slot.url
+    : (DEFAULT_SLOT_IMAGE_MAP[slotId] || slot.url || '');
+
+  const [tempUrl, setTempUrl] = useState(resolvedUrl || '');
   const [tempAlt, setTempAlt] = useState(slot.altText || '');
   const [tempCaption, setTempCaption] = useState(slot.caption || '');
 
@@ -62,10 +68,10 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
 
   const isVideo =
     slot.mediaType === 'video' ||
-    (Boolean(slot.url) &&
-      (slot.url!.includes('.mp4') ||
-        slot.url!.includes('.webm') ||
-        slot.url!.startsWith('data:video')));
+    (Boolean(resolvedUrl) &&
+      (resolvedUrl.includes('.mp4') ||
+        resolvedUrl.includes('.webm') ||
+        resolvedUrl.startsWith('data:video')));
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -122,15 +128,16 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
   };
 
   const displayCaption = caption || slot.caption;
+  const isInsideAdmin = activeRoute === 'admin' || activeRoute === 'editor';
 
   return (
-    <div className={`relative group overflow-hidden rounded-xl border border-[#ded8c4]/80 bg-[#f6f4ec] ${ratioClassMap[finalRatio] || 'aspect-video'} ${className}`}>
-      {/* If media is assigned */}
-      {slot.url ? (
+    <div className={`relative group overflow-hidden rounded-xl bg-[#f6f4ec] ${ratioClassMap[finalRatio] || 'aspect-video'} ${className}`}>
+      {/* If media is assigned or has verified default */}
+      {resolvedUrl ? (
         <div className="relative w-full h-full">
           {isVideo ? (
             <video
-              src={slot.url}
+              src={resolvedUrl}
               autoPlay
               loop
               muted
@@ -139,10 +146,17 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
             />
           ) : (
             <img
-              src={slot.url}
+              src={resolvedUrl}
               alt={slot.altText || slot.label}
               loading={priority ? 'eager' : 'lazy'}
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.dataset.fallback) {
+                  target.dataset.fallback = 'true';
+                  target.src = 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1600&auto=format&fit=crop';
+                }
+              }}
               className={`w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105 ${focalPointClassMap[slot.focalPoint] || 'object-center'}`}
             />
           )}
@@ -173,11 +187,6 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
         /* Architectural placeholder */
         <div className="relative w-full h-full flex flex-col justify-between p-4 sm:p-6 bg-[#f7f5ed] text-[#2c362e] select-none">
           <div className="absolute inset-0 bg-topo-pattern opacity-60 pointer-events-none" />
-
-          <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-[#b8ae93]/60" />
-          <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-[#b8ae93]/60" />
-          <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-[#b8ae93]/60" />
-          <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-[#b8ae93]/60" />
 
           <div className="relative z-10 flex items-center justify-between">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#ebe7da]/90 border border-[#ded8c4] text-[11px] font-medium tracking-wider uppercase text-[#5a5444]">
@@ -211,14 +220,14 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
       {/* Children elements (e.g. badges, custom CTA buttons) */}
       {children && <div className="absolute inset-0 z-10 pointer-events-none">{children}</div>}
 
-      {/* Quick CMS media edit button (visible on hover ONLY for authorized staff with media permissions) */}
-      {showAdminQuickAction && authStatus.isAuthenticated && (authStatus.user?.role === 'admin' || authStatus.user?.permissions?.manageMedia !== false) && (
+      {/* Quick CMS media edit button (ONLY in admin/editor views, NEVER on public site) */}
+      {isInsideAdmin && showAdminQuickAction && authStatus.isAuthenticated && (authStatus.user?.role === 'admin' || authStatus.user?.permissions?.manageMedia !== false) && (
         <div className="absolute top-2.5 right-2.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              setTempUrl(slot.url || '');
+              setTempUrl(resolvedUrl || '');
               setTempAlt(slot.altText || '');
               setTempCaption(slot.caption || '');
               setIsEditing(!isEditing);
@@ -227,13 +236,13 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#1c2920]/90 backdrop-blur-md text-[#fbfbfa] text-[11px] font-medium shadow-md hover:bg-[#152018] transition-colors cursor-pointer"
           >
             <SlidersHorizontal className="w-3 h-3 text-[#d39c4a]" />
-            <span>{slot.url ? 'Change Media' : 'Assign Media'}</span>
+            <span>{resolvedUrl ? 'Change Media' : 'Assign Media'}</span>
           </button>
         </div>
       )}
 
-      {/* Inline Quick Media Config Modal */}
-      {isEditing && (
+      {/* Inline Quick Media Config Modal (ONLY in admin/editor views) */}
+      {isInsideAdmin && isEditing && (
         <div
           className="absolute inset-0 z-30 bg-[#142017]/95 p-4 sm:p-5 flex flex-col justify-between text-[#faf9f5] backdrop-blur-md transition-all overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
@@ -306,7 +315,7 @@ export const MediaFrame: React.FC<MediaFrameProps> = ({
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2">
-              {slot.url && (
+              {resolvedUrl && (
                 <button
                   type="button"
                   onClick={handleClearImage}

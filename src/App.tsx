@@ -88,21 +88,6 @@ const MainApp: React.FC = () => {
       <CmsAdminModal />
       <EnquiryModal />
       <SeoPreviewModal />
-
-      {/* Authenticated Staff Console Floating Access (Hidden on Public Website) */}
-      {authStatus.isAuthenticated && (
-        <div className="fixed bottom-4 right-4 z-30 flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigateTo(authStatus.user?.role === 'editor' ? 'editor' : 'admin')}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#1b2e20]/95 hover:bg-[#1b2e20] text-white text-xs font-semibold rounded-full shadow-lg backdrop-blur-xs border border-white/20 transition-all group cursor-pointer"
-            title="Open Staff Console"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-[#e5a952]" />
-            <span>{authStatus.user?.role === 'editor' ? 'Editor Workspace' : 'Admin Portal'}</span>
-          </button>
-        </div>
-      )}
     </div>
   );
 };

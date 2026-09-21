@@ -33,15 +33,6 @@ export const Navbar: React.FC = () => {
     setMobileMenuOpen(false);
   };
 
-  const handleStaffDashboardClick = () => {
-    setMobileMenuOpen(false);
-    if (authStatus.user?.role === 'editor') {
-      navigateTo('editor');
-    } else {
-      navigateTo('admin');
-    }
-  };
-
   return (
     <header
       className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
@@ -79,18 +70,12 @@ export const Navbar: React.FC = () => {
                   </span>
                   <button
                     type="button"
-                    onClick={handleStaffDashboardClick}
-                    className="text-[#996f2a] hover:underline font-semibold ml-1 cursor-pointer"
-                  >
-                    Console
-                  </button>
-                  <button
-                    type="button"
                     onClick={() => logout()}
-                    className="text-red-700 hover:text-red-900 ml-1 cursor-pointer"
+                    className="text-red-700 hover:text-red-900 ml-1 cursor-pointer flex items-center gap-1 text-[11px]"
                     title="Sign out of staff session"
                   >
                     <LogOut className="w-3 h-3" />
+                    <span>Sign Out</span>
                   </button>
                 </div>
               </>
@@ -196,17 +181,12 @@ export const Navbar: React.FC = () => {
                 <ArrowUpRight className="w-4 h-4 text-[#e5a952]" />
               </button>
 
-              {/* Only show console link in mobile if authenticated */}
+              {/* Only show session status and signout if authenticated */}
               {authStatus.isAuthenticated && authStatus.user && (
                 <div className="flex items-center justify-between text-[11px] text-[#6e6756] px-2 pt-2 border-t border-[#ded8c4]/60">
-                  <button
-                    type="button"
-                    onClick={handleStaffDashboardClick}
-                    className="text-[#996f2a] hover:underline font-semibold flex items-center gap-1.5"
-                  >
-                    <Shield className="w-3.5 h-3.5" />
-                    <span>Staff Console ({authStatus.user.role})</span>
-                  </button>
+                  <span className="font-medium text-[#18261b]">
+                    Signed in: {authStatus.user.fullName} ({authStatus.user.role})
+                  </span>
                   <button
                     type="button"
                     onClick={() => {
