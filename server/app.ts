@@ -357,7 +357,7 @@ function requirePermission(permKey: keyof StoredUser['permissions']) {
 // -----------------------------------------------------------------------------
 
 // API Root endpoint
-app.get('/api', (_req, res) => {
+app.get(['/api', '/api/'], (_req, res) => {
   res.status(200).json({
     success: true,
     message: 'Dzinopona Farms API service operational.',
@@ -365,7 +365,7 @@ app.get('/api', (_req, res) => {
 });
 
 // Production Health Endpoint: independent of unnecessary state, returns 200 when function is functioning
-app.get('/api/health', async (_req, res) => {
+app.get(['/api/health', '/health'], async (_req, res) => {
   try {
     let dbStatus = 'connected';
     try {
@@ -393,7 +393,7 @@ app.get('/api/health', async (_req, res) => {
 });
 
 // Public Content Endpoint (Serves approved website content)
-app.get('/api/content', async (_req, res) => {
+app.get(['/api/content', '/content'], async (_req, res) => {
   try {
     res.setHeader('Cache-Control', 'public, max-age=10, stale-while-revalidate=60');
     const content = await getCmsContent();
@@ -405,7 +405,7 @@ app.get('/api/content', async (_req, res) => {
 });
 
 // Public Commercial Enquiry & Off-take Submission
-app.post('/api/enquiries', enquiryRateLimiter, async (req, res) => {
+app.post(['/api/enquiries', '/enquiries'], enquiryRateLimiter, async (req, res) => {
   try {
     const { name, organization, email, phone, enquiryType, specificProductOrInterest, volumeRequirement, deliveryTimeline, message } = req.body;
 
@@ -480,7 +480,7 @@ app.post('/api/enquiries', enquiryRateLimiter, async (req, res) => {
 // -----------------------------------------------------------------------------
 
 // System Auth Status (Tells client whether first-admin bootstrap is required)
-app.get('/api/auth/status', async (req, res) => {
+app.get(['/api/auth/status', '/auth/status'], async (req, res) => {
   try {
     const bootstrap = await getBootstrapStatus();
     const authHeader = req.headers.authorization;
