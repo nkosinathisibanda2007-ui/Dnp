@@ -7,6 +7,40 @@ service cloud.firestore {
       return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isUserDoc(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasUserDoc() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+             hasUserDoc() &&
+             getUserData().role == 'admin' && 
+             (getUserData().isActive == true || !('isActive' in getUserData()));
+    }
+
+    function isEditor() {
+      return isAuthenticated() && 
+             hasUserDoc() &&
+             getUserData().role == 'editor' && 
+             (getUserData().isActive == true || !('isActive' in getUserData()));
+    }
+
+    function hasEditorPermission(perm) {
+      return isAdmin() || (isEditor() && ('permissions' in getUserData()) && getUserData().permissions[perm] == true);
+    }
+
     // Helper for submission validation
     function isValidSubmission(data) {
       return data.name is string && data.name.size() > 0 && data.name.size() <= 120 &&
@@ -17,23 +51,69 @@ service cloud.firestore {
              (!('interest' in data) || (data.interest is string && data.interest.size() <= 100));
     }
 
-    // CMS dynamic content configuration
+    // CMS dynamic content configuration (Public read, role-based write, seed on empty)
     match /cms_data/{docId} {
       allow get: if isValidId(docId);
       allow list: if true;
-      allow write: if request.auth != null;
+      allow write: if (!exists(/databases/$(database)/documents/cms_data/content)) ||
+                      isAdmin() ||
+                      (isEditor() && hasEditorPermission('editContent'));
     }
 
-    // Customer inquiries and quote requests
+    // Customer inquiries and quote requests (Public create, role-based view/manage)
     match /submissions/{submissionId} {
       allow create: if isValidId(submissionId) && isValidSubmission(request.resource.data);
-      allow read, update, delete: if request.auth != null;
+      allow read, update: if isAdmin() || isEditor();
+      allow delete: if isAdmin();
+    }
+
+    match /enquiries/{enquiryId} {
+      allow create: if isValidId(enquiryId) && isValidSubmission(request.resource.data);
+      allow read, update: if isAdmin() || isEditor();
+      allow delete: if isAdmin();
+    }
+
+    // User management & role storage
+    match /users/{userId} {
+      // User can read their own profile; Admin can read all users
+      allow read: if isUserDoc(userId) || isAdmin();
+      
+      // First bootstrap allowed ONLY when no bootstrap marker exists, otherwise only Admin can create users
+      allow create: if (!exists(/databases/$(database)/documents/system_meta/bootstrap)) || isAdmin();
+      
+      // Users can update their non-privileged fields; Admin can manage editors; Editors cannot escalate
+      allow update: if (isAdmin() && (resource.data.role != 'admin' || request.resource.data.role == 'admin')) ||
+                       (isUserDoc(userId) && request.resource.data.role == resource.data.role && (!('permissions' in request.resource.data) || request.resource.data.permissions == resource.data.permissions));
+      
+      // Only Admin can delete non-admin accounts
+      allow delete: if isAdmin() && resource.data.role != 'admin';
+    }
+
+    // Audit logs (Immutable history; Admin read-only, authenticated append-only)
+    match /audit_logs/{auditId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() || (!exists(/databases/$(database)/documents/system_meta/bootstrap));
+      allow update, delete: if false;
+    }
+
+    // Media metadata
+    match /media_meta/{mediaId} {
+      allow read: if isValidId(mediaId);
+      allow write: if isAdmin() || (isEditor() && hasEditorPermission('manageMedia'));
+    }
+
+    // System metadata & bootstrap tracking
+    match /system_meta/{metaId} {
+      allow read: if true;
+      allow create: if metaId == 'bootstrap' && !exists(/databases/$(database)/documents/system_meta/bootstrap);
+      allow update, delete: if isAdmin();
     }
 
     // Initial SDK connection health verification
     match /test/{docId} {
       allow read: if isValidId(docId);
-      allow write: if request.auth != null;
+      allow write: if isAuthenticated();
     }
   }
 }
+

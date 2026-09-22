@@ -66,6 +66,62 @@
       },
       "required": ["id", "name", "email", "message", "submittedAt"]
     },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Staff profile record for admins and editors with assigned granular permissions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uid": { "type": "string" },
+        "username": { "type": "string" },
+        "email": { "type": "string" },
+        "fullName": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "editor"] },
+        "isActive": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "lastLogin": { "type": "string" }
+      },
+      "required": ["id", "email", "role"]
+    },
+    "AuditLogEntry": {
+      "title": "AuditLogEntry",
+      "description": "Immutable operational log entry recording modifications made across portal modules.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "username": { "type": "string" },
+        "action": { "type": "string" },
+        "module": { "type": "string" },
+        "summary": { "type": "string" }
+      },
+      "required": ["id", "timestamp", "username", "action", "module", "summary"]
+    },
+    "MediaMetadata": {
+      "title": "MediaMetadata",
+      "description": "Metadata for uploaded imagery and video assets hosted in Firebase Storage.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "url": { "type": "string" },
+        "path": { "type": "string" },
+        "filename": { "type": "string" },
+        "contentType": { "type": "string" },
+        "size": { "type": "number" },
+        "uploadedAt": { "type": "string" },
+        "uploadedBy": { "type": "string" }
+      },
+      "required": ["id", "url", "uploadedAt"]
+    },
+    "SystemMetadata": {
+      "title": "SystemMetadata",
+      "description": "System state tracking documents such as bootstrap completion status.",
+      "type": "object",
+      "properties": {
+        "hasAdmin": { "type": "boolean" },
+        "bootstrappedAt": { "type": "string" }
+      }
+    },
     "TestConnection": {
       "title": "TestConnection",
       "description": "Health check connection test document.",
@@ -86,6 +142,26 @@
     "/submissions/{submissionId}": {
       "schema": "ContactSubmission",
       "description": "Client quote inquiries and commercial farm consultation requests"
+    },
+    "/enquiries/{enquiryId}": {
+      "schema": "ContactSubmission",
+      "description": "Customer inquiries and quote requests"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles and permission records"
+    },
+    "/audit_logs/{auditId}": {
+      "schema": "AuditLogEntry",
+      "description": "Historical audit logging trail"
+    },
+    "/media_meta/{mediaId}": {
+      "schema": "MediaMetadata",
+      "description": "Metadata for media files"
+    },
+    "/system_meta/{metaId}": {
+      "schema": "SystemMetadata",
+      "description": "System initialization and bootstrap records"
     },
     "/test/{docId}": {
       "schema": "TestConnection",

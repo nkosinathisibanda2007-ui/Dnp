@@ -1,5 +1,19 @@
 [
   {
+    "id": "audit-1790090178080-bba7db6a",
+    "timestamp": "2026-09-22T15:16:18.080Z",
+    "username": "system",
+    "fullName": "system",
+    "role": "admin",
+    "action": "ENQUIRY_RECEIVED",
+    "module": "enquiries",
+    "section": "enquiries",
+    "summary": "Received new inquiry from Farai Chidzero (farai@agriventures.co.zw)",
+    "recordId": "enq-1790090177810-1769c0",
+    "recordName": "Farai Chidzero",
+    "details": "Received new inquiry from Farai Chidzero (farai@agriventures.co.zw)"
+  },
+  {
     "id": "audit-1789073409257-9a5372ef",
     "timestamp": "2026-09-10T20:50:09.257Z",
     "userId": "edt-1789073393049-6a1a2c",

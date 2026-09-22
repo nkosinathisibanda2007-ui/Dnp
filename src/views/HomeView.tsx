@@ -100,7 +100,7 @@ export const HomeView: React.FC = () => {
         {/* Bottom Hero Ticker */}
         <div className="bg-[#f7f9f2] py-3.5 px-4 sm:px-8">
           <div className="max-w-7xl mx-auto flex items-center justify-between text-xs font-semibold tracking-wider text-[#5f6d62] uppercase">
-            <span>Dzinopana Farms · Zimbabwe</span>
+            <span>Dzinopona Farms · Zimbabwe</span>
             <button
               type="button"
               onClick={() => setActiveRoute('about')}
@@ -109,51 +109,6 @@ export const HomeView: React.FC = () => {
               <span>Discover Our Story</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. FOUR FARMS CONNECTED STRIP (Inspiration from reference site Section 1) */}
-      <section className="bg-[#fcfdf9] py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-[#ecefe6]">
-            <h2 className="text-xl sm:text-2xl font-serif text-[#123c2e]">
-              Four farms. <em className="italic text-[#8b6527]">One connected vision.</em>
-            </h2>
-            <button
-              type="button"
-              onClick={() => setActiveRoute('locations')}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#123c2e] hover:text-[#8b6527] uppercase tracking-wider self-start md:self-auto cursor-pointer"
-            >
-              <span>Meet all four hubs</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
-            {[
-              { id: 'norton', name: 'Norton', num: '01', focus: 'Cereals, Oilseeds & Irrigation' },
-              { id: 'mvuma', name: 'Mvuma', num: '02', focus: 'Livestock, Grazing & Hay' },
-              { id: 'esigodini', name: 'Esigodini', num: '03', focus: 'Orchards, Nursery & Water' },
-              { id: 'ntabazinduna', name: 'Ntabazinduna', num: '04', focus: 'Poultry & Distribution' },
-            ].map((hub) => (
-              <div
-                key={hub.id}
-                onClick={() => setActiveRoute('locations')}
-                className="p-5 rounded-2xl bg-white shadow-2xs hover:shadow-md transition-all cursor-pointer group"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-xs font-bold text-[#8b6527]">{hub.num}</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-[#5f6d62] group-hover:text-[#123c2e] transition-colors" />
-                </div>
-                <h3 className="font-serif font-bold text-base text-[#123c2e] group-hover:text-[#8b6527] transition-colors">
-                  {hub.name}
-                </h3>
-                <p className="text-xs text-[#5f6d62] mt-1 leading-normal">
-                  {hub.focus}
-                </p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -587,34 +542,44 @@ export const HomeView: React.FC = () => {
           </p>
         </div>
 
-        {/* 4 Locations Rows */}
+        {/* 4 Locations Rows — Dynamically synchronized with CMS Admin locations */}
         <div className="divide-y divide-[#ecefe6]">
-          {[
-            { num: '01', name: 'Norton', province: 'Mashonaland West', focus: 'Cereals, Oilseeds & Center-Pivot Irrigation' },
-            { num: '02', name: 'Mvuma', province: 'Midlands', focus: 'Pedigreed Livestock, Grazing Rangelands & Hay' },
-            { num: '03', name: 'Esigodini', province: 'Matabeleland South', focus: 'High-Value Orchards, Nurseries & Water Reservoirs' },
-            { num: '04', name: 'Ntabazinduna', province: 'Matabeleland North', focus: 'Poultry, Controlled Environment & Distribution' },
-          ].map((loc) => (
-            <div
-              key={loc.num}
-              onClick={() => setActiveRoute('locations')}
-              className="py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#f7f9f2] px-4 rounded-xl transition-colors cursor-pointer group"
-            >
-              <div className="flex items-center gap-6">
-                <span className="font-mono text-sm font-bold text-[#8b6527]">{loc.num}</span>
-                <div>
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#123c2e] group-hover:text-[#8b6527] transition-colors">
-                    {loc.name}
-                  </h3>
-                  <span className="text-xs text-[#5f6d62]">{loc.province} • {loc.focus}</span>
+          {(data.locations && data.locations.length > 0
+            ? data.locations
+            : [
+                { id: 'loc-norton', name: 'Norton', province: 'Mashonaland West', primaryFocus: ['Cereals, Oilseeds & Center-Pivot Irrigation'] },
+                { id: 'loc-mvuma', name: 'Mvuma', province: 'Midlands', primaryFocus: ['Pedigreed Livestock, Grazing Rangelands & Hay'] },
+                { id: 'loc-esigodini', name: 'Esigodini', province: 'Matabeleland South', primaryFocus: ['High-Value Orchards, Nurseries & Water Reservoirs'] },
+                { id: 'loc-ntabazinduna', name: 'Ntabazinduna', province: 'Matabeleland North', primaryFocus: ['Poultry, Controlled Environment & Distribution'] },
+              ]
+          ).map((loc, idx) => {
+            const focusText = Array.isArray(loc.primaryFocus)
+              ? loc.primaryFocus.join(' • ')
+              : (loc as any).focus || '';
+            const num = String(idx + 1).padStart(2, '0');
+
+            return (
+              <div
+                key={loc.id || idx}
+                onClick={() => setActiveRoute('locations')}
+                className="py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#f7f9f2] px-4 rounded-xl transition-colors cursor-pointer group"
+              >
+                <div className="flex items-center gap-6">
+                  <span className="font-mono text-sm font-bold text-[#8b6527]">{num}</span>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#123c2e] group-hover:text-[#8b6527] transition-colors">
+                      {loc.name}
+                    </h3>
+                    <span className="text-xs text-[#5f6d62]">{loc.province} • {focusText}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#123c2e] group-hover:text-[#8b6527] transition-colors self-start sm:self-auto">
+                  <span>View farm details</span>
+                  <ArrowRight className="w-4 h-4" />
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#123c2e] group-hover:text-[#8b6527] transition-colors self-start sm:self-auto">
-                <span>View farm details</span>
-                <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="pt-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-semibold tracking-wider text-[#5f6d62] uppercase">
@@ -681,46 +646,6 @@ export const HomeView: React.FC = () => {
                   <ChevronRight className="w-4 h-4 text-[#5f6d62] group-hover:text-[#123c2e] shrink-0 transition-colors" />
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. SECTION 07: LET'S GROW TOGETHER — CLEAN CONTACT BAND (Inspiration from reference site Section 8) */}
-      <section className="bg-[#123c2e] text-white py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-            <div className="space-y-2">
-              <span className="text-xs font-semibold uppercase tracking-widest text-[#d9ed99]">
-                Let's Grow Together
-              </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif leading-tight text-white">
-                Great things grow<br />
-                from a <em className="italic text-[#d9ed99]">conversation.</em>
-              </h2>
-            </div>
-
-            <div className="space-y-4 lg:max-w-md">
-              <p className="text-sm sm:text-base text-[#d1dec4] leading-relaxed">
-                Products, commercial off-take partnerships, or a new agricultural possibility. We’d love to hear from you.
-              </p>
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <button
-                  type="button"
-                  onClick={() => openEnquiryModal('partnership', 'Commercial Enquiry')}
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-white hover:bg-[#f0f3e9] text-[#123c2e] text-sm font-semibold rounded-full shadow-md transition-all cursor-pointer"
-                >
-                  <span>Start a conversation</span>
-                  <ArrowRight className="w-4 h-4 text-[#123c2e]" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveRoute('contact')}
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-full border border-white/20 transition-all cursor-pointer"
-                >
-                  <span>Direct Contact Desk</span>
-                </button>
-              </div>
             </div>
           </div>
         </div>

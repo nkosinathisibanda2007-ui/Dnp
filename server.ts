@@ -5,117 +5,238 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 import { defaultCmsDatabase } from './src/data/defaultData';
 import { CmsDatabase, SiteSettings } from './src/types';
+import {
+  getCmsContent,
+  saveCmsContent,
+  getEnquiries,
+  saveEnquiry,
+  updateEnquiryStatus,
+  deleteEnquiry as removeEnquiry,
+  getUsers,
+  getUserById,
+  getUserByUsernameOrEmail,
+  saveUser,
+  deleteUser as removeUser,
+  getBootstrapStatus,
+  markBootstrapped,
+  getAuditLogs,
+  addAuditLog,
+  clearAuditLogs,
+  uploadMedia,
+  isUsingAdminSdk,
+  StoredUser,
+  StoredEnquiry,
+  StoredAuditEntry,
+} from './src/lib/serverDb';
 
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
 
-// Set up JSON body parser with increased limit for image/video uploads/base64
+// Trust proxy for Vercel and Cloud Run container ingress (needed for correct client IP detection)
+app.set('trust proxy', 1);
+
+// JSON body parser with 40mb limit for media/base64 uploads
 app.use(express.json({ limit: '40mb' }));
 app.use(express.urlencoded({ extended: true, limit: '40mb' }));
 
-// Static directories
+// Static public directory serving
 const PUBLIC_DIR = path.join(process.cwd(), 'public');
 const UPLOADS_DIR = path.join(PUBLIC_DIR, 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  try {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  } catch {
+    // Ignore in read-only environments
+  }
 }
 app.use(express.static(PUBLIC_DIR));
 app.use('/uploads', express.static(UPLOADS_DIR));
 
-// Persistent Database Directory
-const DATA_DIR = path.join(process.cwd(), 'data');
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+// -----------------------------------------------------------------------------
+// 1. LIGHTWEIGHT IN-MEMORY SLIDING-WINDOW RATE LIMITER
+// -----------------------------------------------------------------------------
+interface RateLimitRecord {
+  timestamps: number[];
 }
 
-const CONTENT_FILE = path.join(DATA_DIR, 'content.json');
-const USERS_FILE = path.join(DATA_DIR, 'users.json');
-const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
-const ENQUIRIES_FILE = path.join(DATA_DIR, 'enquiries.json');
-const AUDIT_FILE = path.join(DATA_DIR, 'audit.json');
+const rateLimitStore = new Map<string, RateLimitRecord>();
 
-// Helper functions for reading/writing JSON files safely
-function readJsonFile<T>(filePath: string, fallback: T): T {
-  try {
-    if (!fs.existsSync(filePath)) {
-      writeJsonFile(filePath, fallback);
-      return fallback;
+// Periodically clean up stale rate limit entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  const maxAge = 15 * 60 * 1000;
+  for (const [key, record] of rateLimitStore.entries()) {
+    record.timestamps = record.timestamps.filter((ts) => now - ts < maxAge);
+    if (record.timestamps.length === 0) {
+      rateLimitStore.delete(key);
     }
-    const data = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(data) as T;
-  } catch (err) {
-    console.error(`Error reading ${filePath}:`, err);
-    return fallback;
   }
-}
+}, 5 * 60 * 1000);
 
-function writeJsonFile<T>(filePath: string, data: T): void {
-  try {
-    const tempPath = `${filePath}.tmp`;
-    fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf-8');
-    fs.renameSync(tempPath, filePath);
-  } catch (err) {
-    console.error(`Error writing ${filePath}:`, err);
-  }
-}
+function createRateLimiter(options: { windowMs: number; max: number; message: string }) {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // Determine client IP
+    const clientIp =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim() ||
+      req.socket.remoteAddress ||
+      'unknown-ip';
 
-// In-Memory Cached State
-let currentContent: CmsDatabase = readJsonFile<CmsDatabase>(CONTENT_FILE, defaultCmsDatabase);
+    const key = `${req.baseUrl || ''}${req.path}:${clientIp}`;
+    const now = Date.now();
 
-// Ensure all settings fields exist on cached content
-if (!currentContent.settings.homepage || !currentContent.settings.footer) {
-  currentContent.settings = {
-    ...defaultCmsDatabase.settings,
-    ...currentContent.settings,
-    homepage: currentContent.settings.homepage || defaultCmsDatabase.settings.homepage,
-    footer: currentContent.settings.footer || defaultCmsDatabase.settings.footer,
+    let record = rateLimitStore.get(key);
+    if (!record) {
+      record = { timestamps: [] };
+      rateLimitStore.set(key, record);
+    }
+
+    // Filter out timestamps outside the current sliding window
+    record.timestamps = record.timestamps.filter((ts) => now - ts < options.windowMs);
+
+    if (record.timestamps.length >= options.max) {
+      const oldest = record.timestamps[0];
+      const retryAfterSeconds = Math.ceil((options.windowMs - (now - oldest)) / 1000);
+      res.setHeader('Retry-After', retryAfterSeconds);
+      return res.status(429).json({
+        error: options.message,
+        retryAfterSeconds,
+      });
+    }
+
+    record.timestamps.push(now);
+    next();
   };
-  writeJsonFile(CONTENT_FILE, currentContent);
 }
 
-// Editor Permissions
-export interface EditorPermissions {
-  editContent: boolean;       // General page content (homepage, about, footer, seo, contact)
-  manageProducts: boolean;    // Agricultural products, product images, availability
-  manageServices: boolean;    // Agribusiness services & deliverables
-  manageProjects: boolean;    // Strategic projects, galleries, short videos
-  manageMedia: boolean;       // Media slots & file uploads
-  manageOperations: boolean;  // Operations info & farm imagery
-  manageLocations: boolean;   // Farming locations & hub data
-}
+// Rate limit policies:
+const authRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // max 10 attempts
+  message: 'Too many authentication attempts from this network. Please wait 15 minutes before trying again.',
+});
 
-const defaultEditorPermissions: EditorPermissions = {
-  editContent: true,
-  manageProducts: true,
-  manageServices: true,
-  manageProjects: true,
-  manageMedia: true,
-  manageOperations: true,
-  manageLocations: true,
-};
+const enquiryRateLimiter = createRateLimiter({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 5, // max 5 submissions
+  message: 'Submission limit reached. To prevent abuse, please wait a few minutes before submitting another enquiry.',
+});
 
-// Audit Logger
-interface AuditEntry {
-  id: string;
-  timestamp: string;
-  userId?: string;
+const adminRateLimiter = createRateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  max: 120, // max 120 requests per minute
+  message: 'Administrative request limit reached. Please slow down your requests.',
+});
+
+// -----------------------------------------------------------------------------
+// 2. STATELESS CRYPTOGRAPHIC TOKENS (JWT / HMAC-SHA256)
+// -----------------------------------------------------------------------------
+const SESSION_SECRET = process.env.SESSION_SECRET || 'dzinopona-farms-secure-secret-key-2026';
+
+export interface TokenPayload {
+  userId: string;
   username: string;
-  fullName?: string;
-  role?: 'admin' | 'editor' | 'system';
-  action: string;
-  module: string;
-  section?: string;
-  recordId?: string;
-  recordName?: string;
-  summary: string;
-  details?: string;
-  previousValue?: string;
-  newValue?: string;
+  fullName: string;
+  email: string;
+  role: 'admin' | 'editor';
+  permissions?: StoredUser['permissions'];
+  iat: number;
+  exp: number;
 }
 
-function logAudit(
+function base64UrlEncode(str: string): string {
+  return Buffer.from(str)
+    .toString('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+}
+
+function base64UrlDecode(str: string): string {
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) base64 += '=';
+  return Buffer.from(base64, 'base64').toString('utf8');
+}
+
+function generateSessionToken(user: StoredUser): string {
+  const header = JSON.stringify({ alg: 'HS256', typ: 'JWT' });
+  const now = Math.floor(Date.now() / 1000);
+  const exp = now + 7 * 24 * 60 * 60; // 7 days
+
+  const payload: TokenPayload = {
+    userId: user.id,
+    username: user.username,
+    fullName: user.fullName,
+    email: user.email,
+    role: user.role,
+    permissions: user.permissions,
+    iat: now,
+    exp,
+  };
+
+  const encodedHeader = base64UrlEncode(header);
+  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+  const signature = crypto
+    .createHmac('sha256', SESSION_SECRET)
+    .update(`${encodedHeader}.${encodedPayload}`)
+    .digest('base64')
+    .replace(/=/g, '')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_');
+
+  return `${encodedHeader}.${encodedPayload}.${signature}`;
+}
+
+function verifySessionToken(token: string): TokenPayload | null {
+  try {
+    if (!token) return null;
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    const [encodedHeader, encodedPayload, signature] = parts;
+    const expectedSignature = crypto
+      .createHmac('sha256', SESSION_SECRET)
+      .update(`${encodedHeader}.${encodedPayload}`)
+      .digest('base64')
+      .replace(/=/g, '')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_');
+
+    if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+      return null;
+    }
+
+    const payload: TokenPayload = JSON.parse(base64UrlDecode(encodedPayload));
+    const now = Math.floor(Date.now() / 1000);
+    if (payload.exp && payload.exp < now) {
+      return null;
+    }
+
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+// Password hashing & verification
+function hashPassword(password: string, salt: string): string {
+  return crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+}
+
+function verifyPassword(password: string, salt: string, hash: string): boolean {
+  try {
+    const computed = hashPassword(password, salt);
+    return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(hash));
+  } catch {
+    return false;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 3. AUDIT LOGGING HELPER
+// -----------------------------------------------------------------------------
+async function logAudit(
   user: { username: string; fullName?: string; role?: 'admin' | 'editor' | 'system'; id?: string } | string,
   action: string,
   module: string,
@@ -128,13 +249,12 @@ function logAudit(
     newValue?: string;
   }
 ) {
-  const auditLogs = readJsonFile<AuditEntry[]>(AUDIT_FILE, []);
   const username: string = typeof user === 'string' ? user : user.username;
-  const fullName: string = typeof user === 'string' ? user : (user.fullName || user.username);
-  const role: 'admin' | 'editor' | 'system' = typeof user === 'string' ? 'admin' : (user.role || 'admin');
+  const fullName: string = typeof user === 'string' ? user : user.fullName || user.username;
+  const role: 'admin' | 'editor' | 'system' = typeof user === 'string' ? 'admin' : user.role || 'admin';
   const userId: string | undefined = typeof user === 'string' ? undefined : user.id;
 
-  const entry: AuditEntry = {
+  const entry: StoredAuditEntry = {
     id: `audit-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
     timestamp: new Date().toISOString(),
     userId,
@@ -151,107 +271,16 @@ function logAudit(
     previousValue: extra?.previousValue,
     newValue: extra?.newValue,
   };
-  auditLogs.unshift(entry);
-  // Keep last 500 records
-  writeJsonFile(AUDIT_FILE, auditLogs.slice(0, 500));
+
+  await addAuditLog(entry);
 }
 
-// Password hashing & security
-interface StoredUser {
-  id: string;
-  username: string;
-  email: string;
-  fullName: string;
-  role: 'admin' | 'editor';
-  permissions?: EditorPermissions;
-  isActive?: boolean;
-  salt: string;
-  passwordHash: string;
-  createdAt: string;
-  lastLoginAt?: string;
-  createdBy?: string;
-}
+// -----------------------------------------------------------------------------
+// 4. AUTHORIZATION MIDDLEWARES
+// -----------------------------------------------------------------------------
 
-interface StoredSession {
-  token: string;
-  userId: string;
-  username: string;
-  role: 'admin' | 'editor';
-  fullName: string;
-  permissions?: EditorPermissions;
-  createdAt: string;
-  expiresAt: string;
-}
-
-function hashPassword(password: string, salt: string): string {
-  return crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
-}
-
-function verifyPassword(password: string, salt: string, hash: string): boolean {
-  try {
-    const computed = hashPassword(password, salt);
-    return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(hash));
-  } catch {
-    return false;
-  }
-}
-
-function getStoredUsers(): StoredUser[] {
-  return readJsonFile<StoredUser[]>(USERS_FILE, []);
-}
-
-function saveStoredUsers(users: StoredUser[]): void {
-  writeJsonFile(USERS_FILE, users);
-}
-
-function hasAdminUser(): boolean {
-  const users = getStoredUsers();
-  return users.some((u) => u.role === 'admin');
-}
-
-function getValidSession(token: string): StoredSession | null {
-  if (!token) return null;
-  const sessions = readJsonFile<StoredSession[]>(SESSIONS_FILE, []);
-  const session = sessions.find((s) => s.token === token);
-  if (!session) return null;
-
-  if (new Date(session.expiresAt) < new Date()) {
-    // Session expired
-    return null;
-  }
-  return session;
-}
-
-function createSession(user: StoredUser): string {
-  const token = crypto.randomBytes(32).toString('hex');
-  const sessions = readJsonFile<StoredSession[]>(SESSIONS_FILE, []);
-  
-  // Expiry in 7 days
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-  
-  const newSession: StoredSession = {
-    token,
-    userId: user.id,
-    username: user.username,
-    role: user.role,
-    fullName: user.fullName,
-    permissions: user.permissions || (user.role === 'editor' ? defaultEditorPermissions : undefined),
-    createdAt: new Date().toISOString(),
-    expiresAt,
-  };
-
-  // Filter out expired sessions
-  const activeSessions = sessions.filter((s) => new Date(s.expiresAt) > new Date());
-  activeSessions.push(newSession);
-  writeJsonFile(SESSIONS_FILE, activeSessions);
-
-  return token;
-}
-
-// Authorization Middlewares
-
-// 1. Authenticated user (either Admin or Editor)
-function requireAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
+// Authenticated user (Admin or active Editor)
+async function requireAuth(req: express.Request, res: express.Response, next: express.NextFunction) {
   const authHeader = req.headers.authorization;
   const token = authHeader?.startsWith('Bearer ')
     ? authHeader.substring(7)
@@ -261,29 +290,28 @@ function requireAuth(req: express.Request, res: express.Response, next: express.
     return res.status(401).json({ error: 'Unauthorized: Authentication required to access internal CMS.' });
   }
 
-  const session = getValidSession(token);
-  if (!session) {
+  const payload = verifySessionToken(token);
+  if (!payload) {
     return res.status(401).json({ error: 'Session expired or invalid. Please authenticate again.' });
   }
 
-  const users = getStoredUsers();
-  const user = users.find((u) => u.id === session.userId || u.username.toLowerCase() === session.username.toLowerCase());
+  const user = await getUserById(payload.userId);
   if (!user || user.isActive === false) {
     return res.status(403).json({ error: 'Forbidden: Account has been deactivated. Please contact the Administrator.' });
   }
 
   (req as any).user = {
-    ...session,
+    ...payload,
     role: user.role,
-    permissions: user.permissions || session.permissions || (user.role === 'editor' ? defaultEditorPermissions : undefined),
+    permissions: user.permissions || payload.permissions,
   };
   next();
 }
 
-// 2. Strict Administrator authority (highest-level, employer)
+// Strict Administrator authority (highest-level)
 function requireAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
   requireAuth(req, res, () => {
-    const user = (req as any).user as StoredSession;
+    const user = (req as any).user as TokenPayload;
     if (user.role !== 'admin') {
       return res.status(403).json({
         error: 'Forbidden: Highest-level Administrator authority required. Editor accounts are strictly prohibited from accessing this function.',
@@ -293,11 +321,11 @@ function requireAdmin(req: express.Request, res: express.Response, next: express
   });
 }
 
-// 3. Subordinate permission validator (checks if editor has specific assigned permission; Admin is always allowed)
-function requirePermission(permKey: keyof EditorPermissions) {
+// Subordinate permission validator (checks if editor has specific assigned permission; Admin is always allowed)
+function requirePermission(permKey: keyof StoredUser['permissions']) {
   return (req: express.Request, res: express.Response, next: express.NextFunction) => {
     requireAuth(req, res, () => {
-      const user = (req as any).user as StoredSession;
+      const user = (req as any).user as TokenPayload;
       if (user.role === 'admin') {
         return next();
       }
@@ -314,116 +342,171 @@ function requirePermission(permKey: keyof EditorPermissions) {
 }
 
 // -----------------------------------------------------------------------------
-// PUBLIC API ROUTES
+// 5. PUBLIC API ROUTES
 // -----------------------------------------------------------------------------
 
-// Health check
-app.get('/api/health', (_req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    version: currentContent.version,
-  });
-});
-
-// 1. Public Content Endpoint (Serves the latest approved website content)
-app.get('/api/content', (_req, res) => {
-  res.setHeader('Cache-Control', 'public, max-age=5, stale-while-revalidate=30');
-  res.json(currentContent);
-});
-
-// 2. Public Enquiry Submission Endpoint
-app.post('/api/enquiries', (req, res) => {
+// Comprehensive Production Health Endpoint
+app.get('/api/health', async (_req, res) => {
   try {
-    const { name, organization, email, phone, enquiryType, specificProductOrInterest, message } = req.body;
+    const content = await getCmsContent();
+    const bootstrap = await getBootstrapStatus();
+
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      version: content.version || '2.5.0',
+      database: isUsingAdminSdk ? 'firestore-admin' : 'firestore',
+      storage: 'cloud-storage',
+      hasAdmin: bootstrap.hasAdmin,
+      environment: process.env.VERCEL ? 'vercel-serverless' : 'standalone-container',
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      status: 'degraded',
+      timestamp: new Date().toISOString(),
+      error: err.message,
+    });
+  }
+});
+
+// Public Content Endpoint (Serves approved website content)
+app.get('/api/content', async (_req, res) => {
+  try {
+    res.setHeader('Cache-Control', 'public, max-age=10, stale-while-revalidate=60');
+    const content = await getCmsContent();
+    res.json(content);
+  } catch (err: any) {
+    console.error('Error serving content:', err);
+    res.status(500).json({ error: 'Internal server error loading content.' });
+  }
+});
+
+// Public Enquiry & Commercial Quote Submission
+app.post('/api/enquiries', enquiryRateLimiter, async (req, res) => {
+  try {
+    const { name, organization, email, phone, enquiryType, specificProductOrInterest, volumeRequirement, deliveryTimeline, message } = req.body;
 
     if (!name || !email || !message) {
       return res.status(400).json({ error: 'Missing required fields: name, email, and message are required.' });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    const cleanEmail = String(email).trim().toLowerCase();
+    if (!emailRegex.test(cleanEmail) || cleanEmail.length > 160) {
       return res.status(400).json({ error: 'Invalid email address.' });
     }
 
-    const enquiries = readJsonFile<any[]>(ENQUIRIES_FILE, []);
-    const newEnquiry = {
-      id: `enq-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
-      createdAt: new Date().toISOString(),
-      name: String(name).trim().slice(0, 150),
-      organization: organization ? String(organization).trim().slice(0, 150) : '',
-      email: String(email).trim().toLowerCase().slice(0, 150),
-      phone: phone ? String(phone).trim().slice(0, 50) : '',
-      enquiryType: ['products', 'partnership', 'services', 'careers', 'general'].includes(enquiryType)
-        ? enquiryType
-        : 'general',
-      specificProductOrInterest: specificProductOrInterest ? String(specificProductOrInterest).trim().slice(0, 200) : '',
-      message: String(message).trim().slice(0, 5000),
-      status: 'new',
+    // Sanitize string inputs (strip potential script tags or malicious HTML)
+    const sanitize = (val: any, maxLen: number) => {
+      if (!val) return '';
+      return String(val)
+        .replace(/<[^>]*>?/gm, '')
+        .trim()
+        .slice(0, maxLen);
     };
 
-    enquiries.unshift(newEnquiry);
-    writeJsonFile(ENQUIRIES_FILE, enquiries);
+    const cleanName = sanitize(name, 120);
+    const cleanMessage = sanitize(message, 3000);
 
-    logAudit('system', 'ENQUIRY_RECEIVED', 'enquiries', `Received new inquiry from ${newEnquiry.name} (${newEnquiry.email})`);
+    if (cleanName.length < 2) {
+      return res.status(400).json({ error: 'Please provide a valid full name.' });
+    }
+
+    if (cleanMessage.length < 5) {
+      return res.status(400).json({ error: 'Message must be at least 5 characters long.' });
+    }
+
+    const allowedTypes = ['products', 'partnership', 'services', 'careers', 'grain-offtake', 'citrus-export', 'poultry', 'general'];
+    const validEnquiryType = allowedTypes.includes(enquiryType) ? enquiryType : 'general';
+
+    const newEnquiry: StoredEnquiry = {
+      id: `enq-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
+      name: cleanName,
+      email: cleanEmail,
+      organization: sanitize(organization, 120),
+      phone: sanitize(phone, 40),
+      enquiryType: validEnquiryType,
+      subject: sanitize(req.body.subject, 120),
+      specificProductOrInterest: sanitize(specificProductOrInterest, 100),
+      volumeRequirement: sanitize(volumeRequirement, 100),
+      deliveryTimeline: sanitize(deliveryTimeline, 100),
+      message: cleanMessage,
+      status: 'new',
+      submittedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    };
+
+    await saveEnquiry(newEnquiry);
+    await logAudit('system', 'ENQUIRY_RECEIVED', 'enquiries', `Received new inquiry from ${newEnquiry.name} (${newEnquiry.email})`, {
+      recordId: newEnquiry.id,
+      recordName: newEnquiry.name,
+    });
 
     return res.status(201).json({
       success: true,
-      message: 'Thank you. Your commercial enquiry has been successfully logged with Dzinopona Farms.',
+      message: 'Thank you. Your commercial enquiry has been successfully registered with Dzinopona Farms.',
       id: newEnquiry.id,
     });
   } catch (err: any) {
     console.error('Error submitting enquiry:', err);
-    return res.status(500).json({ error: 'Internal server error processing enquiry.' });
+    return res.status(500).json({ error: 'Internal server error processing commercial enquiry.' });
   }
 });
 
 // -----------------------------------------------------------------------------
-// AUTHENTICATION & BOOTSTRAP ROUTES
+// 6. AUTHENTICATION & BOOTSTRAP ROUTES
 // -----------------------------------------------------------------------------
 
-// Check system auth status (tells client whether a first-admin bootstrap is required)
-app.get('/api/auth/status', (req, res) => {
-  const hasAdmin = hasAdminUser();
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith('Bearer ')
-    ? authHeader.substring(7)
-    : (req.headers['x-admin-token'] as string);
-
-  let session: StoredSession | null = null;
-  if (token) {
-    session = getValidSession(token);
-  }
-
-  let fullUser: StoredUser | undefined;
-  if (session) {
-    const users = getStoredUsers();
-    fullUser = users.find((u) => u.id === session!.userId || u.username.toLowerCase() === session!.username.toLowerCase());
-  }
-
-  return res.json({
-    hasAdmin,
-    isAuthenticated: Boolean(session && fullUser && fullUser.isActive !== false),
-    user: session && fullUser && fullUser.isActive !== false
-      ? {
-          id: fullUser.id,
-          username: fullUser.username,
-          fullName: fullUser.fullName,
-          email: fullUser.email,
-          role: fullUser.role,
-          permissions: fullUser.permissions || session.permissions || (fullUser.role === 'editor' ? defaultEditorPermissions : undefined),
-        }
-      : null,
-  });
-});
-
-// First-Admin Bootstrap Endpoint
-// STRICT SECURITY REQUIREMENT:
-// This endpoint can ONLY operate when NO administrator exists in the system.
-// Once an administrator has been created, this endpoint permanently disables itself.
-app.post('/api/auth/bootstrap', (req, res) => {
+// System Auth Status (Tells client whether first-admin bootstrap is required)
+app.get('/api/auth/status', async (req, res) => {
   try {
-    if (hasAdminUser()) {
+    const bootstrap = await getBootstrapStatus();
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.substring(7)
+      : (req.headers['x-admin-token'] as string);
+
+    let session: TokenPayload | null = null;
+    if (token) {
+      session = verifySessionToken(token);
+    }
+
+    let fullUser: StoredUser | null = null;
+    if (session) {
+      fullUser = await getUserById(session.userId);
+    }
+
+    return res.json({
+      hasAdmin: bootstrap.hasAdmin,
+      isAuthenticated: Boolean(session && fullUser && fullUser.isActive !== false),
+      user:
+        session && fullUser && fullUser.isActive !== false
+          ? {
+              id: fullUser.id,
+              username: fullUser.username,
+              fullName: fullUser.fullName,
+              email: fullUser.email,
+              role: fullUser.role,
+              permissions: fullUser.permissions || session.permissions,
+            }
+          : null,
+    });
+  } catch (err: any) {
+    console.error('Auth status check error:', err);
+    res.status(500).json({ error: 'Failed to verify system authentication status.' });
+  }
+});
+
+// Secure First-Admin Bootstrap Endpoint
+// STRICT REQUIREMENTS:
+// - Can ONLY operate when NO administrator exists in the system.
+// - Once an administrator exists, this endpoint is permanently locked.
+// - Never hardcodes passwords or emails.
+app.post('/api/auth/bootstrap', authRateLimiter, async (req, res) => {
+  try {
+    const bootstrap = await getBootstrapStatus();
+    if (bootstrap.hasAdmin) {
       return res.status(403).json({
         error: 'First administrator already provisioned. Bootstrap mechanism is permanently locked.',
       });
@@ -443,6 +526,11 @@ app.post('/api/auth/bootstrap', (req, res) => {
       return res.status(400).json({ error: 'Username must be at least 3 characters.' });
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+
     if (password.length < 8) {
       return res.status(400).json({ error: 'Password must be at least 8 characters long.' });
     }
@@ -450,84 +538,99 @@ app.post('/api/auth/bootstrap', (req, res) => {
     const salt = crypto.randomBytes(16).toString('hex');
     const passwordHash = hashPassword(password, salt);
 
-    const newAdmin: StoredUser = {
+    const adminUser: StoredUser = {
       id: `usr-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
       username: cleanUsername,
       email: cleanEmail,
       fullName: cleanFullName,
       role: 'admin',
+      permissions: {
+        editContent: true,
+        manageProducts: true,
+        manageServices: true,
+        manageProjects: true,
+        manageMedia: true,
+        manageOperations: true,
+        manageLocations: true,
+      },
+      isActive: true,
       salt,
       passwordHash,
       createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString(),
     };
 
-    const users = getStoredUsers();
-    users.push(newAdmin);
-    saveStoredUsers(users);
+    await saveUser(adminUser);
+    await markBootstrapped(adminUser);
 
-    const token = createSession(newAdmin);
-    logAudit(cleanUsername, 'BOOTSTRAP_INITIAL_ADMIN', 'auth', `Initial administrative account provisioned for ${cleanFullName} (${cleanUsername})`);
+    const token = generateSessionToken(adminUser);
+
+    await logAudit(
+      adminUser,
+      'FIRST_ADMIN_BOOTSTRAP',
+      'auth',
+      `Master Administrator account (${cleanUsername} / ${cleanEmail}) provisioned successfully. Bootstrap permanently closed.`
+    );
 
     return res.status(201).json({
       success: true,
-      message: 'Initial administrator successfully provisioned.',
+      message: 'Master Administrator account successfully provisioned. Bootstrap is now permanently sealed.',
       token,
       user: {
-        id: newAdmin.id,
-        username: newAdmin.username,
-        email: newAdmin.email,
-        fullName: newAdmin.fullName,
-        role: newAdmin.role,
+        id: adminUser.id,
+        username: adminUser.username,
+        fullName: adminUser.fullName,
+        email: adminUser.email,
+        role: adminUser.role,
+        permissions: adminUser.permissions,
       },
     });
   } catch (err: any) {
     console.error('Bootstrap error:', err);
-    return res.status(500).json({ error: 'Internal server error during bootstrap.' });
+    return res.status(500).json({ error: 'Internal server error during administrator bootstrap.' });
   }
 });
 
-// Authentication Login Endpoint (Admin & Subordinate Editor)
-app.post('/api/auth/login', (req, res) => {
+// Login Endpoint (Staff Authentication for Admins & Editors)
+app.post('/api/auth/login', authRateLimiter, async (req, res) => {
   try {
-    const rawIdentifier = req.body.identifier || req.body.username || req.body.email;
-    const { password } = req.body;
+    const { identifier, username, password } = req.body;
+    const loginId = identifier || username;
 
-    if (!rawIdentifier || !password) {
+    if (!loginId || !password) {
       return res.status(400).json({ error: 'Username/email and password are required.' });
     }
 
-    const cleanIdentifier = String(rawIdentifier).trim().toLowerCase();
-    const users = getStoredUsers();
-    const user = users.find(
-      (u) => u.username.toLowerCase() === cleanIdentifier || u.email.toLowerCase() === cleanIdentifier
-    );
-
+    const user = await getUserByUsernameOrEmail(loginId);
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials. Please verify your username and password.' });
+      return res.status(401).json({ error: 'Invalid username/email or password.' });
     }
 
     if (user.isActive === false) {
-      return res.status(403).json({ error: 'This account has been deactivated by the Administrator.' });
+      return res.status(403).json({ error: 'This account has been deactivated. Please contact the Administrator.' });
     }
 
-    const isMatch = verifyPassword(password, user.salt, user.passwordHash);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid credentials. Please verify your username and password.' });
+    // Verify password hash
+    let passwordValid = false;
+    if (user.salt && user.passwordHash) {
+      passwordValid = verifyPassword(password, user.salt, user.passwordHash);
+    }
+
+    if (!passwordValid) {
+      return res.status(401).json({ error: 'Invalid username/email or password.' });
     }
 
     // Update last login
     user.lastLoginAt = new Date().toISOString();
-    saveStoredUsers(users);
+    await saveUser(user);
 
-    const token = createSession(user);
-    const roleLabel = user.role === 'admin' ? 'Administrator' : 'Authorized Content Editor';
-    logAudit(
+    const token = generateSessionToken(user);
+
+    await logAudit(
       user,
-      'LOGIN_SUCCESS',
+      'USER_LOGIN',
       'auth',
-      `${roleLabel} authenticated: ${user.fullName} (@${user.username})`,
-      { recordName: user.fullName }
+      `${user.fullName} (${user.role.toUpperCase()}) authenticated into internal CMS.`
     );
 
     return res.json({
@@ -536,10 +639,10 @@ app.post('/api/auth/login', (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        email: user.email,
         fullName: user.fullName,
+        email: user.email,
         role: user.role,
-        permissions: user.permissions || (user.role === 'editor' ? defaultEditorPermissions : undefined),
+        permissions: user.permissions,
       },
     });
   } catch (err: any) {
@@ -549,67 +652,54 @@ app.post('/api/auth/login', (req, res) => {
 });
 
 // Logout Endpoint
-app.post('/api/auth/logout', (req, res) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.startsWith('Bearer ')
-    ? authHeader.substring(7)
-    : (req.headers['x-admin-token'] as string);
-
-  if (token) {
-    const sessions = readJsonFile<StoredSession[]>(SESSIONS_FILE, []);
-    const filtered = sessions.filter((s) => s.token !== token);
-    writeJsonFile(SESSIONS_FILE, filtered);
-  }
-
-  res.json({ success: true, message: 'Logged out successfully.' });
+app.post('/api/auth/logout', requireAuth, async (req, res) => {
+  const user = (req as any).user;
+  await logAudit(user, 'USER_LOGOUT', 'auth', `${user.fullName} logged out of CMS session.`);
+  res.json({ success: true, message: 'Successfully logged out.' });
 });
 
-// Current User Endpoint (supports Admin and Editor)
+// Current User Profile Endpoint
 app.get('/api/auth/me', requireAuth, (req, res) => {
-  const session = (req as any).user;
-  res.json({
-    user: {
-      id: session.userId,
-      username: session.username,
-      fullName: session.fullName,
-      role: session.role,
-      permissions: session.permissions,
-    },
-  });
+  const user = (req as any).user;
+  res.json({ user });
 });
 
 // -----------------------------------------------------------------------------
-// EDITOR MANAGEMENT (ADMIN ONLY)
+// 7. SENSITIVE ADMINISTRATIVE USER MANAGEMENT (ADMIN ONLY)
 // -----------------------------------------------------------------------------
 
-// List all Editor accounts
-app.get('/api/admin/editors', requireAdmin, (_req, res) => {
-  const users = getStoredUsers();
-  const editors = users
-    .filter((u) => u.role === 'editor')
-    .map((u) => ({
+// List All Staff Accounts (Admin Only)
+app.get('/api/admin/users', requireAdmin, async (_req, res) => {
+  try {
+    const users = await getUsers();
+    const safeUsers = users.map((u) => ({
       id: u.id,
       username: u.username,
       email: u.email,
       fullName: u.fullName,
       role: u.role,
-      permissions: u.permissions || defaultEditorPermissions,
+      permissions: u.permissions,
       isActive: u.isActive !== false,
       createdAt: u.createdAt,
       lastLoginAt: u.lastLoginAt,
-      createdBy: u.createdBy || 'Administrator',
+      createdBy: u.createdBy,
     }));
-  res.json(editors);
+    res.json(safeUsers);
+  } catch (err: any) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ error: 'Failed to fetch user list.' });
+  }
 });
 
-// Admin provisions a new Editor
-app.post('/api/admin/editors', requireAdmin, (req, res) => {
+// Create New Editor Account (Admin Only)
+// STRICT: Editors CANNOT create other users or elevate anyone to Admin
+app.post('/api/admin/users', requireAdmin, async (req, res) => {
   try {
-    const { username, email, fullName, password, permissions } = req.body;
-    const adminUser = (req as any).user;
+    const currentAdmin = (req as any).user;
+    const { username, email, fullName, password, permissions, role } = req.body;
 
-    if (!username || !email || !fullName || !password) {
-      return res.status(400).json({ error: 'Full name, username, email, and password are required.' });
+    if (!username || !email || !password || !fullName) {
+      return res.status(400).json({ error: 'All fields (full name, username, email, and password) are required.' });
     }
 
     const cleanUsername = String(username).trim().toLowerCase();
@@ -617,30 +707,28 @@ app.post('/api/admin/editors', requireAdmin, (req, res) => {
     const cleanFullName = String(fullName).trim();
 
     if (cleanUsername.length < 3) {
-      return res.status(400).json({ error: 'Username must contain at least 3 characters.' });
+      return res.status(400).json({ error: 'Username must be at least 3 characters.' });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters long.' });
     }
 
-    const users = getStoredUsers();
-    if (users.some((u) => u.username.toLowerCase() === cleanUsername)) {
-      return res.status(400).json({ error: `Username "${cleanUsername}" is already in use.` });
-    }
-    if (users.some((u) => u.email.toLowerCase() === cleanEmail)) {
-      return res.status(400).json({ error: `Email address "${cleanEmail}" is already registered.` });
+    const existingUser = await getUserByUsernameOrEmail(cleanUsername);
+    if (existingUser) {
+      return res.status(409).json({ error: 'A user with that username or email already exists.' });
     }
 
+    const assignedRole = role === 'admin' ? 'admin' : 'editor';
     const salt = crypto.randomBytes(16).toString('hex');
     const passwordHash = hashPassword(password, salt);
 
-    const newEditor: StoredUser = {
+    const newUser: StoredUser = {
       id: `edt-${Date.now()}-${crypto.randomBytes(3).toString('hex')}`,
       username: cleanUsername,
       email: cleanEmail,
       fullName: cleanFullName,
-      role: 'editor',
+      role: assignedRole,
       permissions: {
         editContent: permissions?.editContent ?? true,
         manageProducts: permissions?.manageProducts ?? true,
@@ -654,387 +742,161 @@ app.post('/api/admin/editors', requireAdmin, (req, res) => {
       salt,
       passwordHash,
       createdAt: new Date().toISOString(),
-      createdBy: adminUser.fullName || adminUser.username,
+      createdBy: currentAdmin.fullName || currentAdmin.username,
     };
 
-    users.push(newEditor);
-    saveStoredUsers(users);
+    await saveUser(newUser);
 
-    logAudit(
-      adminUser,
-      'EDITOR_CREATED',
-      'editors',
-      `Admin created new Editor account: ${cleanFullName} (@${cleanUsername})`,
-      { recordId: newEditor.id, recordName: cleanFullName }
+    await logAudit(
+      currentAdmin,
+      'USER_CREATED',
+      'users',
+      `Created new ${assignedRole.toUpperCase()} account for ${cleanFullName} (${cleanUsername})`,
+      { recordId: newUser.id, recordName: cleanFullName }
     );
 
     return res.status(201).json({
       success: true,
-      message: `Editor account for "${cleanFullName}" created successfully.`,
-      editor: {
-        id: newEditor.id,
-        username: newEditor.username,
-        email: newEditor.email,
-        fullName: newEditor.fullName,
-        role: newEditor.role,
-        permissions: newEditor.permissions,
-        isActive: newEditor.isActive,
-        createdAt: newEditor.createdAt,
+      message: `${assignedRole === 'admin' ? 'Administrator' : 'Editor'} account created successfully.`,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        fullName: newUser.fullName,
+        role: newUser.role,
+        permissions: newUser.permissions,
+        isActive: newUser.isActive,
       },
     });
   } catch (err: any) {
-    console.error('Error creating editor:', err);
-    return res.status(500).json({ error: 'Failed to create editor account.' });
+    console.error('Error creating user:', err);
+    res.status(500).json({ error: 'Failed to create user account.' });
   }
 });
 
-// Admin updates Editor permissions / active status
-app.put('/api/admin/editors/:id', requireAdmin, (req, res) => {
+// Update User Permissions or Status (Admin Only)
+app.patch('/api/admin/users/:id', requireAdmin, async (req, res) => {
   try {
+    const currentAdmin = (req as any).user;
     const { id } = req.params;
-    const { fullName, email, permissions, isActive } = req.body;
-    const adminUser = (req as any).user;
+    const { permissions, isActive, fullName, email, password } = req.body;
 
-    const users = getStoredUsers();
-    const userIndex = users.findIndex((u) => u.id === id);
-    if (userIndex === -1) {
-      return res.status(404).json({ error: 'Editor account not found.' });
+    const user = await getUserById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
     }
 
-    const editor = users[userIndex];
-    if (editor.role !== 'editor') {
-      return res.status(400).json({ error: 'Cannot modify non-editor accounts via this endpoint.' });
+    // Safety: Cannot deactivate the primary or only admin account
+    if (user.role === 'admin' && isActive === false) {
+      const users = await getUsers();
+      const activeAdmins = users.filter((u) => u.role === 'admin' && u.isActive !== false);
+      if (activeAdmins.length <= 1) {
+        return res.status(400).json({ error: 'Cannot deactivate the only active Administrator account.' });
+      }
     }
 
-    const previousPerms = JSON.stringify(editor.permissions);
+    if (fullName) user.fullName = String(fullName).trim();
+    if (email) user.email = String(email).trim().toLowerCase();
+    if (isActive !== undefined) user.isActive = Boolean(isActive);
 
-    if (fullName) editor.fullName = String(fullName).trim();
-    if (email) editor.email = String(email).trim().toLowerCase();
-    if (typeof isActive === 'boolean') editor.isActive = isActive;
-    if (permissions) {
-      editor.permissions = {
-        editContent: permissions.editContent ?? editor.permissions?.editContent ?? true,
-        manageProducts: permissions.manageProducts ?? editor.permissions?.manageProducts ?? true,
-        manageServices: permissions.manageServices ?? editor.permissions?.manageServices ?? true,
-        manageProjects: permissions.manageProjects ?? editor.permissions?.manageProjects ?? true,
-        manageMedia: permissions.manageMedia ?? editor.permissions?.manageMedia ?? true,
-        manageOperations: permissions.manageOperations ?? editor.permissions?.manageOperations ?? true,
-        manageLocations: permissions.manageLocations ?? editor.permissions?.manageLocations ?? true,
+    if (permissions && user.role === 'editor') {
+      user.permissions = {
+        ...user.permissions,
+        ...permissions,
       };
     }
 
-    saveStoredUsers(users);
+    if (password && String(password).trim().length >= 8) {
+      user.salt = crypto.randomBytes(16).toString('hex');
+      user.passwordHash = hashPassword(password, user.salt);
+    }
 
-    logAudit(
-      adminUser,
-      'EDITOR_PERMISSIONS_UPDATED',
-      'editors',
-      `Admin updated permissions/status for Editor ${editor.fullName} (@${editor.username})`,
-      {
-        recordId: editor.id,
-        recordName: editor.fullName,
-        previousValue: previousPerms,
-        newValue: JSON.stringify(editor.permissions),
-      }
+    await saveUser(user);
+
+    await logAudit(
+      currentAdmin,
+      'USER_UPDATED',
+      'users',
+      `Updated account configuration for ${user.fullName} (${user.username})`,
+      { recordId: user.id, recordName: user.fullName }
     );
 
     return res.json({
       success: true,
-      message: `Editor "${editor.fullName}" updated successfully.`,
-      editor: {
-        id: editor.id,
-        username: editor.username,
-        email: editor.email,
-        fullName: editor.fullName,
-        role: editor.role,
-        permissions: editor.permissions,
-        isActive: editor.isActive !== false,
-        createdAt: editor.createdAt,
-        lastLoginAt: editor.lastLoginAt,
+      message: `Account for ${user.fullName} updated successfully.`,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+        permissions: user.permissions,
+        isActive: user.isActive,
       },
     });
   } catch (err: any) {
-    console.error('Error updating editor:', err);
-    return res.status(500).json({ error: 'Failed to update editor.' });
+    console.error('Error updating user:', err);
+    res.status(500).json({ error: 'Failed to update user account.' });
   }
 });
 
-// Admin resets an Editor's password
-app.post('/api/admin/editors/:id/reset-password', requireAdmin, (req, res) => {
+// Delete User Account (Admin Only; Cannot delete Admin accounts)
+app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
   try {
+    const currentAdmin = (req as any).user;
     const { id } = req.params;
-    const { newPassword } = req.body;
-    const adminUser = (req as any).user;
 
-    if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ error: 'New password must be at least 6 characters.' });
+    const user = await getUserById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found.' });
     }
 
-    const users = getStoredUsers();
-    const editor = users.find((u) => u.id === id);
-    if (!editor || editor.role !== 'editor') {
-      return res.status(404).json({ error: 'Editor account not found.' });
-    }
-
-    const salt = crypto.randomBytes(16).toString('hex');
-    editor.salt = salt;
-    editor.passwordHash = hashPassword(newPassword, salt);
-    saveStoredUsers(users);
-
-    // Invalidate active sessions for this editor
-    const sessions = readJsonFile<StoredSession[]>(SESSIONS_FILE, []);
-    writeJsonFile(SESSIONS_FILE, sessions.filter((s) => s.userId !== editor.id));
-
-    logAudit(
-      adminUser,
-      'EDITOR_PASSWORD_RESET',
-      'editors',
-      `Admin reset password for Editor ${editor.fullName} (@${editor.username})`,
-      { recordId: editor.id, recordName: editor.fullName }
-    );
-
-    return res.json({ success: true, message: `Password reset successfully for ${editor.fullName}.` });
-  } catch (err: any) {
-    return res.status(500).json({ error: 'Failed to reset password.' });
-  }
-});
-
-// Admin deletes an Editor
-app.delete('/api/admin/editors/:id', requireAdmin, (req, res) => {
-  try {
-    const { id } = req.params;
-    const adminUser = (req as any).user;
-
-    const users = getStoredUsers();
-    const editor = users.find((u) => u.id === id);
-    if (!editor) {
-      return res.status(404).json({ error: 'Editor not found.' });
-    }
-    if (editor.role !== 'editor') {
-      return res.status(400).json({ error: 'Cannot delete an administrator account.' });
-    }
-
-    const remaining = users.filter((u) => u.id !== id);
-    saveStoredUsers(remaining);
-
-    // Remove active sessions
-    const sessions = readJsonFile<StoredSession[]>(SESSIONS_FILE, []);
-    writeJsonFile(SESSIONS_FILE, sessions.filter((s) => s.userId !== id));
-
-    logAudit(
-      adminUser,
-      'EDITOR_DELETED',
-      'editors',
-      `Admin deleted Editor account "${editor.fullName}" (@${editor.username})`,
-      { recordId: editor.id, recordName: editor.fullName }
-    );
-
-    return res.json({ success: true, message: `Editor "${editor.fullName}" deleted.` });
-  } catch (err: any) {
-    return res.status(500).json({ error: 'Failed to delete editor.' });
-  }
-});
-
-// Admin view of Editor Activity & Audit Trail
-app.get('/api/admin/editor-activity', requireAdmin, (req, res) => {
-  const { editor, module, search, limit } = req.query;
-  let auditLogs = readJsonFile<AuditEntry[]>(AUDIT_FILE, []);
-
-  if (editor) {
-    auditLogs = auditLogs.filter((a) => a.username.toLowerCase() === String(editor).toLowerCase());
-  }
-  if (module && module !== 'all') {
-    auditLogs = auditLogs.filter((a) => a.module === module);
-  }
-  if (search) {
-    const q = String(search).toLowerCase();
-    auditLogs = auditLogs.filter(
-      (a) =>
-        a.summary?.toLowerCase().includes(q) ||
-        a.recordName?.toLowerCase().includes(q) ||
-        a.username?.toLowerCase().includes(q) ||
-        a.fullName?.toLowerCase().includes(q) ||
-        a.details?.toLowerCase().includes(q)
-    );
-  }
-
-  const maxItems = limit ? Math.min(parseInt(String(limit), 10) || 100, 500) : 200;
-  res.json({
-    total: auditLogs.length,
-    entries: auditLogs.slice(0, maxItems),
-  });
-});
-
-// -----------------------------------------------------------------------------
-// SUBORDINATE EDITOR OVERVIEW
-// -----------------------------------------------------------------------------
-
-app.get('/api/editor/overview', requireAuth, (req, res) => {
-  const user = (req as any).user;
-  const auditLogs = readJsonFile<AuditEntry[]>(AUDIT_FILE, []);
-  const myLogs = auditLogs.filter((a) => a.username.toLowerCase() === user.username.toLowerCase()).slice(0, 15);
-
-  res.json({
-    user: {
-      username: user.username,
-      fullName: user.fullName,
-      role: user.role,
-      permissions: user.permissions,
-    },
-    counts: {
-      products: currentContent.products.length,
-      operations: currentContent.operations.length,
-      projects: currentContent.projects.length,
-      services: currentContent.services.length,
-      locations: currentContent.locations.length,
-      mediaSlots: Object.keys(currentContent.mediaSlots).length,
-    },
-    recentPersonalActivity: myLogs,
-    lastUpdated: currentContent.lastUpdated,
-  });
-});
-
-// -----------------------------------------------------------------------------
-// SECURE MEDIA UPLOAD (IMAGES & SHORT VIDEOS)
-// -----------------------------------------------------------------------------
-
-app.post('/api/media/upload', requireAuth, (req, res) => {
-  try {
-    const user = (req as any).user;
-    if (user.role === 'editor' && user.permissions?.manageMedia === false) {
-      return res.status(403).json({ error: 'Permission denied: Your Editor account cannot upload media.' });
-    }
-
-    const { filename, mimeType, base64Data, altText, caption, targetType } = req.body;
-
-    if (!filename || !mimeType || !base64Data) {
-      return res.status(400).json({ error: 'Filename, mimeType, and base64Data are required.' });
-    }
-
-    const allowedImageMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
-    const allowedVideoMimes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime'];
-
-    const isImage = allowedImageMimes.includes(mimeType.toLowerCase());
-    const isVideo = allowedVideoMimes.includes(mimeType.toLowerCase());
-
-    if (!isImage && !isVideo) {
-      return res.status(400).json({
-        error: `Unsupported format (${mimeType}). Supported: JPEG, PNG, WEBP, AVIF, MP4, WEBM.`,
+    if (user.role === 'admin') {
+      return res.status(403).json({
+        error: 'Administrator accounts cannot be deleted to preserve governance safety.',
       });
     }
 
-    const base64Clean = base64Data.replace(/^data:[a-zA-Z0-9\/\-\+]+;base64,/, '');
-    const buffer = Buffer.from(base64Clean, 'base64');
+    await removeUser(id);
 
-    const maxBytes = isVideo ? 35 * 1024 * 1024 : 15 * 1024 * 1024;
-    if (buffer.length > maxBytes) {
-      return res.status(400).json({
-        error: `File exceeds size limit (${isVideo ? '35MB for videos' : '15MB for images'}). Please optimize media.`,
-      });
-    }
-
-    const ext = path.extname(filename).toLowerCase() || (isVideo ? '.mp4' : '.jpg');
-    const safeBasename = path.basename(filename, ext).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40);
-    const uniqueName = `${Date.now()}-${crypto.randomBytes(4).toString('hex')}-${safeBasename || 'asset'}${ext}`;
-    const destinationPath = path.join(UPLOADS_DIR, uniqueName);
-
-    fs.writeFileSync(destinationPath, buffer);
-
-    const relativeUrl = `/uploads/${uniqueName}`;
-
-    logAudit(
-      user,
-      isVideo ? 'VIDEO_UPLOADED' : 'IMAGE_UPLOADED',
-      'media',
-      `${user.fullName} (${user.role === 'admin' ? 'Administrator' : 'Editor'}) uploaded ${isVideo ? 'short video' : 'image'}: ${filename}`,
-      {
-        recordName: filename,
-        newValue: relativeUrl,
-        details: `Uploaded ${isImage ? 'image' : 'video'} (${(buffer.length / (1024 * 1024)).toFixed(2)} MB)`,
-      }
+    await logAudit(
+      currentAdmin,
+      'USER_DELETED',
+      'users',
+      `Deleted Editor account for ${user.fullName} (${user.username})`,
+      { recordId: id, recordName: user.fullName }
     );
 
-    return res.status(201).json({
-      success: true,
-      url: relativeUrl,
-      filename: uniqueName,
-      originalName: filename,
-      mimeType,
-      sizeBytes: buffer.length,
-      altText,
-      caption,
-    });
+    return res.json({ success: true, message: `Account for ${user.fullName} deleted successfully.` });
   } catch (err: any) {
-    console.error('Upload error:', err);
-    return res.status(500).json({ error: 'Internal server error processing file upload.' });
+    console.error('Error deleting user:', err);
+    res.status(500).json({ error: 'Failed to delete user account.' });
   }
 });
 
 // -----------------------------------------------------------------------------
-// PROTECTED CMS ADMIN API ROUTES
+// 8. PROTECTED CMS CONTENT MANAGEMENT
 // -----------------------------------------------------------------------------
 
-// Admin Dashboard Overview Stats
-app.get('/api/admin/overview', requireAdmin, (_req, res) => {
-  const enquiries = readJsonFile<any[]>(ENQUIRIES_FILE, []);
-  const auditLogs = readJsonFile<AuditEntry[]>(AUDIT_FILE, []);
-
-  res.json({
-    version: currentContent.version,
-    lastUpdated: currentContent.lastUpdated,
-    stats: {
-      operationsCount: currentContent.operations.length,
-      productsCount: currentContent.products.length,
-      projectsCount: currentContent.projects.length,
-      locationsCount: currentContent.locations.length,
-      mediaSlotsCount: Object.keys(currentContent.mediaSlots).length,
-      activePhotosCount: Object.values(currentContent.mediaSlots).filter((s) => Boolean(s.url)).length,
-      totalEnquiries: enquiries.length,
-      unreviewedEnquiries: enquiries.filter((e) => e.status === 'new').length,
-    },
-    recentAuditLogs: auditLogs.slice(0, 10),
-  });
-});
-
-// Get Commercial Enquiries
-app.get('/api/admin/enquiries', requireAdmin, (_req, res) => {
-  const enquiries = readJsonFile<any[]>(ENQUIRIES_FILE, []);
-  res.json(enquiries);
-});
-
-// Mark Enquiry Status
-app.patch('/api/admin/enquiries/:id', requireAdmin, (req, res) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  const enquiries = readJsonFile<any[]>(ENQUIRIES_FILE, []);
-  const enq = enquiries.find((e) => e.id === id);
-
-  if (!enq) {
-    return res.status(404).json({ error: 'Enquiry not found.' });
-  }
-
-  enq.status = status || 'reviewed';
-  writeJsonFile(ENQUIRIES_FILE, enquiries);
-
-  logAudit((req as any).user.username, 'ENQUIRY_STATUS_UPDATED', 'enquiries', `Enquiry ${id} marked as ${enq.status}`);
-  res.json({ success: true, enquiry: enq });
-});
-
-// Update Specific Content Section
-// (homepage, about, operations, products, projects, services, locations, contact, footer, seo, settings, mediaSlots)
-app.put('/api/admin/content/:section', requireAuth, (req, res) => {
+// Update Specific Content Section (Role & Subordinate Permission Guarded)
+app.put('/api/admin/content/:section', adminRateLimiter, requireAuth, async (req, res) => {
   try {
     const { section } = req.params;
     const payload = req.body;
-    const user = (req as any).user;
+    const user = (req as any).user as TokenPayload;
 
-    if (!payload) {
-      return res.status(400).json({ error: 'Payload body is required.' });
-    }
-
-    // Role-based permission checks for Subordinate Editor accounts
+    // Check editor subordinate permissions
     if (user.role === 'editor') {
-      const perms = user.permissions || defaultEditorPermissions;
+      const perms = user.permissions || {
+        editContent: true,
+        manageProducts: true,
+        manageServices: true,
+        manageProjects: true,
+        manageMedia: true,
+        manageOperations: true,
+        manageLocations: true,
+      };
+
       if (section === 'products' && !perms.manageProducts) {
         return res.status(403).json({ error: 'Permission denied: Your Editor account is not permitted to manage Products.' });
       }
@@ -1061,6 +923,7 @@ app.put('/api/admin/content/:section', requireAuth, (req, res) => {
       }
     }
 
+    const currentContent = await getCmsContent();
     currentContent.lastUpdated = new Date().toISOString();
 
     switch (section) {
@@ -1079,37 +942,27 @@ app.put('/api/admin/content/:section', requireAuth, (req, res) => {
         break;
 
       case 'operations':
-        if (!Array.isArray(payload)) {
-          return res.status(400).json({ error: 'Operations payload must be an array.' });
-        }
+        if (!Array.isArray(payload)) return res.status(400).json({ error: 'Operations payload must be an array.' });
         currentContent.operations = payload;
         break;
 
       case 'products':
-        if (!Array.isArray(payload)) {
-          return res.status(400).json({ error: 'Products payload must be an array.' });
-        }
+        if (!Array.isArray(payload)) return res.status(400).json({ error: 'Products payload must be an array.' });
         currentContent.products = payload;
         break;
 
       case 'projects':
-        if (!Array.isArray(payload)) {
-          return res.status(400).json({ error: 'Projects payload must be an array.' });
-        }
+        if (!Array.isArray(payload)) return res.status(400).json({ error: 'Projects payload must be an array.' });
         currentContent.projects = payload;
         break;
 
       case 'services':
-        if (!Array.isArray(payload)) {
-          return res.status(400).json({ error: 'Services payload must be an array.' });
-        }
+        if (!Array.isArray(payload)) return res.status(400).json({ error: 'Services payload must be an array.' });
         currentContent.services = payload;
         break;
 
       case 'locations':
-        if (!Array.isArray(payload)) {
-          return res.status(400).json({ error: 'Locations payload must be an array.' });
-        }
+        if (!Array.isArray(payload)) return res.status(400).json({ error: 'Locations payload must be an array.' });
         currentContent.locations = payload;
         break;
 
@@ -1149,50 +1002,25 @@ app.put('/api/admin/content/:section', requireAuth, (req, res) => {
         break;
 
       case 'full':
-        // Restore/Update full database
-        currentContent = {
-          ...payload,
-          lastUpdated: new Date().toISOString(),
-        };
+        Object.assign(currentContent, payload, { lastUpdated: new Date().toISOString() });
         break;
 
       default:
         return res.status(400).json({ error: `Unknown content section: ${section}` });
     }
 
-    // Persist to disk
-    writeJsonFile(CONTENT_FILE, currentContent);
+    await saveCmsContent(currentContent, user.fullName || user.username);
 
-    // Detailed Audit trail
+    // Audit Logging
     const roleLabel = user.role === 'admin' ? 'Administrator' : 'Editor';
-    let summary = `${user.fullName} (${roleLabel}) updated ${section} content`;
-    let recordName = `Section: ${section}`;
-    let newDetail = '';
-
-    if (section === 'products' && Array.isArray(payload)) {
-      summary = `${user.fullName} updated agricultural products catalogue (${payload.length} products)`;
-      recordName = `Products (${payload.length} items)`;
-      newDetail = payload.map((p: any) => `${p.name} [${p.status}]`).slice(0, 5).join(', ');
-    } else if (section === 'projects' && Array.isArray(payload)) {
-      const videosCount = payload.filter((pr: any) => Boolean(pr.video?.url)).length;
-      summary = `${user.fullName} updated strategic development projects (${payload.length} projects, ${videosCount} videos)`;
-      recordName = `Projects (${payload.length} items)`;
-    } else if (section === 'services' && Array.isArray(payload)) {
-      summary = `${user.fullName} updated agribusiness services (${payload.length} services)`;
-      recordName = `Services (${payload.length} items)`;
-    } else if (section === 'operations' && Array.isArray(payload)) {
-      summary = `${user.fullName} updated farm operations (${payload.length} operations)`;
-      recordName = `Operations (${payload.length} items)`;
-    }
-
-    logAudit(user, 'CONTENT_UPDATED', section, summary, {
-      recordName,
-      details: newDetail || summary,
+    const summary = `${user.fullName} (${roleLabel}) updated ${section} content`;
+    await logAudit(user, 'CONTENT_UPDATED', section, summary, {
+      recordName: `Section: ${section}`,
     });
 
     return res.json({
       success: true,
-      message: `Content section "${section}" successfully saved.`,
+      message: `Content section "${section}" saved successfully.`,
       lastUpdated: currentContent.lastUpdated,
       data: currentContent,
     });
@@ -1202,20 +1030,17 @@ app.put('/api/admin/content/:section', requireAuth, (req, res) => {
   }
 });
 
-// Update or Assign a Media Slot
-app.post('/api/admin/media', requireAuth, (req, res) => {
+// Assign Media Slot
+app.post('/api/admin/media', requirePermission('manageMedia'), async (req, res) => {
   try {
     const { slotId, url, altText, caption, focalPoint } = req.body;
     const user = (req as any).user;
-
-    if (user.role === 'editor' && user.permissions?.manageMedia === false) {
-      return res.status(403).json({ error: 'Permission denied: Your Editor account is not permitted to manage media.' });
-    }
 
     if (!slotId) {
       return res.status(400).json({ error: 'slotId is required.' });
     }
 
+    const currentContent = await getCmsContent();
     const existingSlot = currentContent.mediaSlots[slotId] || {
       id: slotId,
       label: 'Dzinopona Farms Media Slot',
@@ -1236,22 +1061,16 @@ app.post('/api/admin/media', requireAuth, (req, res) => {
     };
 
     currentContent.lastUpdated = new Date().toISOString();
-    writeJsonFile(CONTENT_FILE, currentContent);
+    await saveCmsContent(currentContent, user.fullName || user.username);
 
     const actionType = url ? 'MEDIA_ASSIGNED' : 'MEDIA_CLEARED';
     const summary = `${user.fullName} (${user.role}) updated media slot "${slotId}" (URL: ${url ? 'Assigned' : 'Cleared'})`;
 
-    logAudit(
-      user,
-      actionType,
-      'media',
-      summary,
-      {
-        recordId: slotId,
-        recordName: slotId,
-        newValue: url || 'placeholder',
-      }
-    );
+    await logAudit(user, actionType, 'media', summary, {
+      recordId: slotId,
+      recordName: slotId,
+      newValue: url || 'placeholder',
+    });
 
     return res.json({
       success: true,
@@ -1265,20 +1084,20 @@ app.post('/api/admin/media', requireAuth, (req, res) => {
   }
 });
 
-// Reset Content to Master Default Baseline
-app.post('/api/admin/reset', requireAdmin, (req, res) => {
+// Reset Content to Master Default Baseline (Admin Only)
+app.post('/api/admin/reset', requireAdmin, async (req, res) => {
   try {
-    const username = (req as any).user.username;
-    currentContent = JSON.parse(JSON.stringify(defaultCmsDatabase));
-    currentContent.lastUpdated = new Date().toISOString();
-    writeJsonFile(CONTENT_FILE, currentContent);
+    const user = (req as any).user;
+    const resetContent = JSON.parse(JSON.stringify(defaultCmsDatabase));
+    resetContent.lastUpdated = new Date().toISOString();
 
-    logAudit(username, 'CONTENT_RESET_TO_DEFAULTS', 'all', 'Content database reset to master verified baseline.');
+    await saveCmsContent(resetContent, user.fullName || user.username);
+    await logAudit(user, 'CONTENT_RESET_TO_DEFAULTS', 'all', 'Content database reset to master verified baseline.');
 
     return res.json({
       success: true,
       message: 'Website content successfully restored to verified client baseline.',
-      data: currentContent,
+      data: resetContent,
     });
   } catch (err: any) {
     console.error('Reset error:', err);
@@ -1286,38 +1105,241 @@ app.post('/api/admin/reset', requireAdmin, (req, res) => {
   }
 });
 
-// Audit Log Viewer
-app.get('/api/admin/audit', requireAdmin, (_req, res) => {
-  const auditLogs = readJsonFile<AuditEntry[]>(AUDIT_FILE, []);
-  res.json(auditLogs);
+// -----------------------------------------------------------------------------
+// 9. ENQUIRY MANAGEMENT (ADMIN & PERMITTED EDITORS)
+// -----------------------------------------------------------------------------
+
+// List Customer Enquiries
+app.get('/api/admin/enquiries', requireAuth, async (_req, res) => {
+  try {
+    const enquiries = await getEnquiries();
+    res.json(enquiries);
+  } catch (err: any) {
+    console.error('Error fetching enquiries:', err);
+    res.status(500).json({ error: 'Failed to fetch enquiries.' });
+  }
+});
+
+// Update Enquiry Status
+app.patch('/api/admin/enquiries/:id', requireAuth, async (req, res) => {
+  try {
+    const user = (req as any).user;
+    const { id } = req.params;
+    const { status, notes } = req.body;
+
+    const allowedStatuses = ['new', 'in-review', 'contacted', 'resolved', 'archived'];
+    if (status && !allowedStatuses.includes(status)) {
+      return res.status(400).json({ error: 'Invalid status value.' });
+    }
+
+    const success = await updateEnquiryStatus(id, status, notes);
+    if (!success) {
+      return res.status(404).json({ error: 'Enquiry not found or could not be updated.' });
+    }
+
+    await logAudit(user, 'ENQUIRY_UPDATED', 'enquiries', `${user.fullName} updated enquiry ${id} status to ${status}`, {
+      recordId: id,
+      newValue: status,
+    });
+
+    return res.json({ success: true, message: 'Enquiry status updated successfully.' });
+  } catch (err: any) {
+    console.error('Error updating enquiry:', err);
+    res.status(500).json({ error: 'Failed to update enquiry status.' });
+  }
+});
+
+// Delete Enquiry (Admin Only; Editors cannot delete customer inquiries)
+app.delete('/api/admin/enquiries/:id', requireAdmin, async (req, res) => {
+  try {
+    const user = (req as any).user;
+    const { id } = req.params;
+
+    const success = await removeEnquiry(id);
+    if (!success) {
+      return res.status(404).json({ error: 'Enquiry not found.' });
+    }
+
+    await logAudit(user, 'ENQUIRY_DELETED', 'enquiries', `${user.fullName} deleted enquiry ${id}`, {
+      recordId: id,
+    });
+
+    return res.json({ success: true, message: 'Enquiry deleted successfully.' });
+  } catch (err: any) {
+    console.error('Error deleting enquiry:', err);
+    res.status(500).json({ error: 'Failed to delete enquiry.' });
+  }
 });
 
 // -----------------------------------------------------------------------------
-// VITE MIDDLEWARE & STATIC FILE SERVING
+// 10. AUDIT LOG VIEWER (ADMIN ONLY)
 // -----------------------------------------------------------------------------
 
-async function startServer() {
-  if (process.env.NODE_ENV !== 'production') {
-    const { createServer: createViteServer } = await import('vite');
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: 'spa',
+// STRICT: Editors must NOT view restricted audit logs
+app.get('/api/admin/audit', requireAdmin, async (_req, res) => {
+  try {
+    const logs = await getAuditLogs();
+    res.json(logs);
+  } catch (err: any) {
+    console.error('Error fetching audit logs:', err);
+    res.status(500).json({ error: 'Failed to fetch audit logs.' });
+  }
+});
+
+// Clear Audit Logs (Admin Only)
+app.delete('/api/admin/audit', requireAdmin, async (req, res) => {
+  try {
+    const user = (req as any).user;
+    await clearAuditLogs();
+    await logAudit(user, 'AUDIT_CLEARED', 'audit', `${user.fullName} cleared historical audit logs.`);
+    res.json({ success: true, message: 'Audit logs cleared.' });
+  } catch (err: any) {
+    console.error('Error clearing audit logs:', err);
+    res.status(500).json({ error: 'Failed to clear audit logs.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// 11. PRODUCTION MEDIA UPLOAD (CLOUDINARY / FIREBASE CLOUD STORAGE)
+// -----------------------------------------------------------------------------
+
+// Protected Media Upload with Strict File Type and Size Verification
+app.post('/api/media/upload', requirePermission('manageMedia'), async (req, res) => {
+  try {
+    const user = (req as any).user;
+    const { filename, fileData, mimeType, contentType } = req.body;
+
+    if (!fileData || !filename) {
+      return res.status(400).json({ error: 'filename and fileData (base64) are required.' });
+    }
+
+    const resolvedMime = (contentType || mimeType || 'image/jpeg').toLowerCase();
+    const allowedMimeTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'image/svg+xml',
+      'video/mp4',
+      'video/webm',
+      'video/quicktime',
+    ];
+
+    if (!allowedMimeTypes.includes(resolvedMime)) {
+      return res.status(400).json({
+        error: `Unsupported file type "${resolvedMime}". Supported types: JPEG, PNG, WebP, SVG, MP4, WebM.`,
+      });
+    }
+
+    // Reject dangerous file extensions
+    const ext = path.extname(filename).toLowerCase();
+    const disallowedExts = ['.exe', '.sh', '.bat', '.php', '.js', '.py', '.rb', '.pl', '.cmd', '.msi'];
+    if (disallowedExts.includes(ext)) {
+      return res.status(400).json({ error: 'Disallowed file extension for security.' });
+    }
+
+    // Decode base64 payload safely
+    const cleanBase64 = fileData.replace(/^data:[^;]+;base64,/, '');
+    const buffer = Buffer.from(cleanBase64, 'base64');
+
+    // Enforce size limits: 10MB for images, 30MB for videos
+    const isVideo = resolvedMime.startsWith('video/');
+    const maxSizeBytes = isVideo ? 30 * 1024 * 1024 : 10 * 1024 * 1024;
+    if (buffer.length > maxSizeBytes) {
+      return res.status(400).json({
+        error: `File size (${(buffer.length / (1024 * 1024)).toFixed(1)}MB) exceeds the maximum allowed limit of ${isVideo ? '30MB' : '10MB'}.`,
+      });
+    }
+
+    const uploadResult = await uploadMedia(buffer, filename, resolvedMime, user.fullName || user.username);
+
+    await logAudit(
+      user,
+      'MEDIA_UPLOADED',
+      'media',
+      `${user.fullName} uploaded ${isVideo ? 'video' : 'image'} asset "${filename}" (${(buffer.length / 1024).toFixed(1)} KB)`,
+      { recordName: filename, newValue: uploadResult.url }
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: 'Media asset uploaded successfully.',
+      ...uploadResult,
     });
-    app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+  } catch (err: any) {
+    console.error('Media upload error:', err);
+    return res.status(500).json({ error: 'Failed to process media upload.' });
+  }
+});
+
+// Media slots list
+app.get('/api/media/slots', async (_req, res) => {
+  try {
+    const content = await getCmsContent();
+    res.json(content.mediaSlots || {});
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to fetch media slots.' });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// 12. GLOBAL ERROR HANDLING & VERCEL / STANDALONE STARTUP
+// -----------------------------------------------------------------------------
+
+// Catch-all 404 handler for unmatched API routes
+app.all('/api/*', (_req, res) => {
+  res.status(404).json({ error: 'API endpoint not found.' });
+});
+
+// Global Express error handler: guarantees JSON responses, never returns HTML or crashes
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error('Unhandled server exception:', err);
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({
+    success: false,
+    error: err.message || 'Internal server error.',
+  });
+});
+
+// Handle unhandled rejections and uncaught exceptions gracefully
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Promise Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception thrown:', err);
+});
+
+// Start local dev / standalone server
+// Vercel Serverless automatically bypasses this because process.env.VERCEL is set
+async function startServer() {
+  if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
+    if (process.env.NODE_ENV !== 'production') {
+      const { createServer: createViteServer } = await import('vite');
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: 'spa',
+      });
+      app.use(vite.middlewares);
+    } else {
+      const distPath = path.join(process.cwd(), 'dist');
+      app.use(express.static(distPath));
+      app.get('*', (_req, res) => {
+        res.sendFile(path.join(distPath, 'index.html'));
+      });
+    }
+
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Dzinopona Farms server running on http://0.0.0.0:${PORT}`);
+      console.log(`- Public Website: http://0.0.0.0:${PORT}/`);
+      console.log(`- Internal Auth:  http://0.0.0.0:${PORT}/auth`);
+      console.log(`- CMS Dashboard:  http://0.0.0.0:${PORT}/admin`);
     });
   }
-
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Dzinopona Farms server running on http://0.0.0.0:${PORT}`);
-    console.log(`- Public Website: http://0.0.0.0:${PORT}/`);
-    console.log(`- Internal Auth:  http://0.0.0.0:${PORT}/auth`);
-    console.log(`- CMS Dashboard:  http://0.0.0.0:${PORT}/admin`);
-  });
 }
 
 startServer();
+
+// Export the Express app for Vercel Serverless Function deployment
+export default app;
+export { app };
